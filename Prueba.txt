@@ -1,0 +1,22 @@
+DECVAR
+	a,b,e: Integer
+	c,d: String
+ENDDEC
+a := 10
+b := 20
+c := "cadena" 
+d := "de prueba"
+e := 2
+IF(a<b AND b== 20)
+	REPEAT 
+		REPEAT
+			e:=e-1
+		UNTIL (e>1)
+		a:=a-1
+	UNTIL (a!=0)
+	IF (a==0)
+		WRITE "a es igual a cero"
+	ELSE
+		WRITE "a no es igual a cero"
+	ENDIF
+ENDIF

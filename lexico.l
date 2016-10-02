@@ -1,12 +1,15 @@
 %{
+	#define YYSTYPE t_simbolo *
     #include "lexico.h"
 
     FILE *f;
     //**Lista que contiene la tabla de simbolos**//
 	list <t_simbolo> listSimbolos;
+	char constantes[100];
 
     int declarando=0;
     int linea = 1;
+
 %}
 
 DIGITO  	[0-9]
@@ -14,8 +17,8 @@ LETRA   	[a-zA-Z]
 
 DECVAR			DECVAR
 ENDDEC	    	ENDDEC
-WHILE       	WHILE
-ENDWHILE    	ENDWHILE
+REPEAT       	REPEAT
+UNTIL    	    UNTIL
 IF          	IF
 ENDIF       	ENDIF
 ELSE			ELSE
@@ -73,8 +76,8 @@ COMENTARIO  {COMENT_AB}([^\/]|(\/[^-]))*{COMENT_CERR}
 
 {DECVAR}        { agregar_nop_lista_tokens("PR"); declarando=1; return DECVAR;}
 {ENDDEC}        { agregar_nop_lista_tokens("PR"); declarando=0; return ENDDEC;}
-{WHILE}       	{ agregar_nop_lista_tokens("PR"); return WHILE;}
-{ENDWHILE}    	{ agregar_nop_lista_tokens("PR"); return ENDWHILE;}
+{REPEAT}       	{ agregar_nop_lista_tokens("PR"); return REPEAT;}
+{UNTIL}    	    { agregar_nop_lista_tokens("PR"); return UNTIL;}
 {IF}          	{ agregar_nop_lista_tokens("PR"); return IF;}
 {ENDIF}       	{ agregar_nop_lista_tokens("PR"); return ENDIF;}
 {ELSE}			{ agregar_nop_lista_tokens("PR"); return ELSE;}
@@ -110,10 +113,50 @@ COMENTARIO  {COMENT_AB}([^\/]|(\/[^-]))*{COMENT_CERR}
 {DOSPUNTOS}   { agregar_op_lista_tokens("DOSPUNTOS"); return DOSPUNTOS;}
 {PORCIENTO}    { agregar_op_lista_tokens("PORCIENTO"); return PORCIENTO;}
 
-{ID}          { validar(0); agregarSimbolo(yytext,0); agregar_nop_lista_tokens("ID"); return ID;}
-{CTE_INT}     { validar(1); agregarSimbolo(yytext,1); agregar_nop_lista_tokens("CTE_INT"); return CTE_INT; }
-{CTE_REAL}    { validar(2); agregarSimbolo(yytext,2); agregar_nop_lista_tokens("CTE_REAL"); return CTE_REAL;}
-{CTE_STR}     { validar(3); agregarSimbolo(yytext,3); agregar_nop_lista_tokens("CTE_STR"); return CTE_STR;}
+{ID} {
+	validar(0);
+	if (declarando == 1){
+		agregarSimbolo(yytext,0);
+	}
+	agregar_nop_lista_tokens("ID");
+	yylval = buscarSimbolo(yytext);
+	if (yylval == NULL){
+		yylval = ( t_simbolo* )malloc( sizeof(t_simbolo) );
+		if ( !yylval ){
+			return -1;
+		}
+		yylval->nombre = ( char* )malloc( sizeof(char)*31 );
+		strcpy(yylval->nombre,yytext);
+	}
+	return ID;
+}
+{CTE_INT}     {
+	validar(1);
+	agregarSimbolo(yytext,1);
+	agregar_nop_lista_tokens("CTE_INT");
+	strcpy(constantes,"_");
+	strcat(constantes,yytext);
+	yylval = buscarSimbolo(constantes);
+	return CTE_INT;
+}
+{CTE_REAL}    {
+	validar(2);
+	agregarSimbolo(yytext,2);
+	agregar_nop_lista_tokens("CTE_REAL");
+	strcpy(constantes,"_");
+	strcat(constantes,yytext);
+	yylval = buscarSimbolo(constantes);
+	return CTE_REAL;
+}
+{CTE_STR}     {
+	validar(3);
+	agregarSimbolo(yytext,3);
+	agregar_nop_lista_tokens("CTE_STR");
+	strcpy(constantes,"_");
+	strcat(constantes,yytext);
+	yylval = buscarSimbolo(constantes);
+	return CTE_STR;
+}
 
 .	{ printf("Error lexico en %s \n", yytext); exit(-1); }
 
@@ -129,27 +172,25 @@ void validar(int tipo)
         	case 0:
             {
 		        if(len > 30)
-			{
-		           printf("Error en %s, las id y constantes no pueden superar los 30 caracteres\n", yytext);
-	                   exit(-1);
-                	}
- 		      }
-		case 1:
-	           {
+				{
+		           		printf("Error en %s, las id y constantes no pueden superar los 30 caracteres\n", yytext);
+	                    exit(-1);
+                }
+ 		    }
+			case 1:
+	        {
 	                if(len > 30)
-			{
-                    printf("Error en %s, las id y constantes no pueden superar los 30 caracteres\n", yytext);
+					{
+                    	printf("Error en %s, las id y constantes no pueden superar los 30 caracteres\n", yytext);
 	                    exit(-1);
 	                }
-
 	                long aux = atol(yytext);
 					if(aux > MAX_ENTERO)
-                {
-                    printf("Error lexico: %s entero fuera de rango\n", yytext);
+                	{
+                    	printf("Error lexico: %s entero fuera de rango\n", yytext);
 	                    exit(-1);
                 	}
-            	    };break;
-
+			};break;
 	        case 2:
 	           {
                 if(len > 30)
@@ -201,29 +242,52 @@ int agregarSimbolo(const char* nombre, int tipo){
 	if ( pos == -1 ){
 
 		info = ( t_simbolo* )malloc( sizeof(t_simbolo) );
-		if ( !info )
+		if ( !info ){
 			return -1;
+		}
 
 		info->nombre = ( char* )malloc( sizeof(char)*31 );
 		info->tipo = ( char* )malloc( sizeof(char)*31 );
 		info->valor = ( char* )malloc( sizeof(char)*31 );
 		info->alias = ( char* )malloc( sizeof(char)*31 );
 
-		if(tipo==0)
-            strcpy( info->nombre, nombre);
-		else{
+        strcpy( info->alias, " ");
+        strcpy( info->valor, " ");
+        strcpy( info->tipo, " ");
+        info->longitud = 0;
+		if(tipo==0){
+			strcpy( info->nombre, nombre);
+		}
+        else{
             strcpy( info->valor, nombre);
             sprintf(aux,"_%s",yytext);
             strcpy( info->nombre, aux);
             }
 
-		if (tipo==3)
+		if (tipo==3){
             info->longitud = strlen(yytext);
+		}
 		listSimbolos.push_back( *info );
 		pos = listSimbolos.size();
 		free(info);
 	}
 	return pos;
+}
+
+void guardarAlias(const char* identificador, const char* alias){
+	list<t_simbolo>::iterator it;
+	if(!listSimbolos.empty()){
+		// Obtenemos un iterador al comienzo de la lista
+		it = listSimbolos.begin();
+		// Buscamos el elemento
+		while( it != listSimbolos.end() && strcmp((*it).nombre,identificador)!=0){
+			it++;
+		}
+		// Si no se encontro el elemento
+		if ( it != listSimbolos.end()){
+			strcpy (it->alias,alias);
+		}
+    }
 }
 
 //busca en tabla, si encuentra devuelve la posicion y pone el tipo del identificador
@@ -245,4 +309,45 @@ int buscarEnTS(const char* nombre){
 		}
     }
     return pos;
+}
+
+t_simbolo* buscarSimbolo(const char* nombre){
+	list<t_simbolo>::iterator it;
+	t_simbolo * pSimbolo = NULL;
+	if(!listSimbolos.empty()){
+		// Obtenemos un iterador al comienzo de la lista
+		it = listSimbolos.begin();
+		// Buscamos el elemento
+		while( it != listSimbolos.end() && strcmp((*it).nombre,nombre)!=0){
+			it++;
+		}
+		// Si no se encontro el elemento
+		if ( it != listSimbolos.end()){
+			pSimbolo = &(*it);
+		}
+    }
+    return pSimbolo;
+}
+
+
+void escribirTS() {
+
+	FILE *ptrTs;
+	if ((ptrTs = fopen("ts.txt", "wt")) == NULL)
+	{
+		printf("\nNo se puede abrir el archivo: ts.txt\n");
+		exit(-1);
+	}
+
+	fprintf(ptrTs,"%-33s%-15s%-15s%-31s%-5s\n", "Nombre","Alias","Tipo", "Valor", "Longitud");
+	fprintf(ptrTs,"----------------------------------------------------------------------------------------------------------\n");
+	// Recorro la lista de simbolos y voy mostrando todos sus atributos
+	for( list<t_simbolo>::iterator it = listSimbolos.begin(); it != listSimbolos.end(); ++it){
+		fprintf(ptrTs,"%-33s", it->nombre);
+		fprintf(ptrTs,"%-15s", it->alias);
+		fprintf(ptrTs,"%-15s", it->tipo);
+		fprintf(ptrTs,"%-31s", it->valor);
+		fprintf(ptrTs,"%-5d\n", it->longitud);
+	}
+	fclose(ptrTs);
 }

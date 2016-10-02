@@ -1,6 +1,15 @@
 #ifndef g_lexico_h
 #define g_lexico_h
 
+//estructura de simbolos de la tabla
+typedef struct{
+    char *nombre;
+    int tipo;
+    char *valor;
+    int longitud;
+    char *alias;
+}t_simbolo;
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -39,19 +48,13 @@ void agregar_op_lista_tokens(const char *);
 int yylex(void);
 int yyerror(const char *);
 int agregarSimbolo(const char*, int);
+void guardarAlias(const char*, const char*);
 int buscarEnTS(const char*);
+t_simbolo* buscarSimbolo(const char* nombre);
 int obtenerTipo(int);
 void escribirTS();
 int hexaAdec(const char *);
 int binaAdec(const char *);
-//estructura de simbolos de la tabla
-typedef struct{
-    char *nombre;
-    char *tipo;
-    char *valor;
-    int longitud;
-    char *alias;
-}t_simbolo;
 
 typedef struct{
     char nombre[32];

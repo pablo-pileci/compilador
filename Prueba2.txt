@@ -1,0 +1,7 @@
+DECVAR
+	a,a2: Integer
+ENDDEC
+
+a3 := a2 {
+b := 10	
+}

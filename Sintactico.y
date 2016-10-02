@@ -1,8 +1,9 @@
 
 %{
+	#define YYSTYPE t_simbolo *
 	#include "lexico.h"
 	FILE *reglas=NULL;
-
+	char error[1000];
 	#define CANTVAR 200
 
     #include "ttipos.h"
@@ -17,10 +18,10 @@
 
 %token  ID
 		CTE_INT
-		CTE_REAL
-		CTE_STR
-		WHILE
-		ENDWHILE
+	    CTE_REAL
+	    CTE_STR
+		REPEAT
+		UNTIL
 		IF
 		ENDIF
 		ELSE
@@ -63,7 +64,6 @@
         ALIAS
         BETWEEN
 
-
 %left   OP_SUMA OP_RESTA OP_POR OP_DIV PAR_CERR CORC_CERR
 %right  OP_ASIG PAR_AB CORC_AB
 %start  programa
@@ -71,148 +71,209 @@
 
 %%
 programa: declaracion cuerpo
-		{ printf("0  - (START) PROGRAMA: DECLARACION CUERPO\n\n***** COMPILACION EXITOSA *****\n");fprintf(reglas, "0 ");
-		escribirTS();
-		}  ;
+		{
+			printf("0  - (START) PROGRAMA: DECLARACION CUERPO\n\n***** COMPILACION EXITOSA *****\n");
+			fprintf(reglas, "0 ");
+			escribirTS();
+		} |
+		cuerpo {
+			printf("1  - (START) PROGRAMA: CUERPO\n\n***** COMPILACION EXITOSA *****\n");
+			fprintf(reglas, "1 ");
+			escribirTS();
+		}  |
+		declaracion {
+			printf("2  - (START) PROGRAMA: DECLARACION\n\n***** COMPILACION EXITOSA *****\n");
+			fprintf(reglas, "2 ");
+			escribirTS();
+		};
 
-cuerpo: sentencia
-		{ printf("1  - CUERPO: SENTENCIA\n");fprintf(reglas, "1 ");	}
+cuerpo: sentencia {
+			printf("3  - CUERPO: SENTENCIA\n");
+			fprintf(reglas, "3 ");
+		}
 
 	| cuerpo sentencia
-		{ printf("2  - CUERPO: CUERPO SENTENCIA\n");fprintf(reglas, "2 ");}
-			;
+		{
+			printf("4  - CUERPO: CUERPO SENTENCIA\n");
+			fprintf(reglas, "4 ");
+		};
 
 
 sentencia: asignacion
-		{ printf("3  - SENTENCIA: ASIGNACION\n");fprintf(reglas, "3 ");	}
+		{
+			printf("5  - SENTENCIA: ASIGNACION\n");
+			fprintf(reglas, "5 ");
+		}
 	| iteracion
-		{ printf("4  - SENTENCIA: ITERACION\n");fprintf(reglas, "4 "); }
+		{
+			printf("6  - SENTENCIA: ITERACION\n");
+			fprintf(reglas, "6 ");
+		}
 	| decision
-		{ printf("5  - SENTENCIA: DECISION\n");fprintf(reglas, "5 "); }
+		{
+			printf("7  - SENTENCIA: DECISION\n");
+			fprintf(reglas, "7 ");
+		}
 	| io
-		{ printf("6  - SENTENCIA: IO\n");fprintf(reglas, "6 "); }
+		{
+			printf("8  - SENTENCIA: IO\n");
+			fprintf(reglas, "8 ");
+		}
 	|funcion
-		{ printf("7  - SENTENCIA: FUNCION\n");fprintf(reglas, "7 "); };
+		{
+			printf("9  - SENTENCIA: FUNCION\n");
+			fprintf(reglas, "9 ");
+		};
 
-declaracion: DECVAR  lineadeclara ENDDEC
-		{	printf("8  - DECVAR  lineadeclara ENDDEC\n"); fprintf(reglas, "8 ");};
+declaracion: DECVAR  dec ENDDEC
+		{
+			printf("10  - DECVAR  dec\n");
+			fprintf(reglas, "10 ");
+		} | DECVAR ENDDEC
+		{
+			printf("11  - DECVAR  dec\n");
+			fprintf(reglas, "11 ");
+		};
+
+dec : lineadeclara
+        {
+        	printf("12  - lineadeclara ENDDEC  dec\n");
+        	fprintf(reglas, "12 ");
+        }
+        |dec lineadeclara
+            {
+            	printf("13  - dec lineadeclara ENNDEC  dec\n");
+            	fprintf(reglas, "13 ");
+            };
 
 
 lineadeclara: listavar DOSPUNTOS tipo
-		{	printf("9  - lineadeclara: listavar DOSPUNTOS tipo\n"); fprintf(reglas, "9 ");};
+		{
+			printf("14  - lineadeclara: listavar DOSPUNTOS tipo\n");
+			fprintf(reglas, "14 ");
+		};
+
 
 tipo: INTEGER
-		{ printf("10 - TIPO: INTEGER\n");fprintf(reglas, "14 ");}
+		{
+			printf("15 - TIPO: INTEGER\n");
+			fprintf(reglas, "15 ");
+		}
 	| FLOAT
-		{ printf("11 - TIPO: FLOAT\n");fprintf(reglas, "15 ");}
+		{
+			printf("16 - TIPO: FLOAT\n");
+			fprintf(reglas, "16 ");
+		}
 	| STRING
-		{ printf("12 - TIPO: STRING\n");fprintf(reglas, "16 ");}  ;
+		{
+			printf("17 - TIPO: STRING\n");
+			fprintf(reglas, "17 ");
+		};
 
 listavar: vars
-		{ printf("13 - LISTAVAR: VARS\n");fprintf(reglas, "17 "); }  ;
+		{
+			printf("18 - LISTAVAR: VARS\n");
+			fprintf(reglas, "18 ");
+		};
 
 vars: id
 		{
-			printf("14 - VARS: ID\n");fprintf(reglas, "18 ");
+			printf("19 - VARS: ID\n");
+			fprintf(reglas, "19 ");
 		}
 	| vars COMA id
 		{
-			printf("15 - VARS: VARS COMA ID\n");fprintf(reglas, "19	");
+			printf("20 - VARS: VARS COMA ID\n");
+			fprintf(reglas, "20	");
 		}  ;
 
 asignacion: id OP_ASIG exp
 		{
-			printf("16 - ASIGNACION: ID OP_ASIG EXP\n");fprintf(reglas, "20 ");
-			if($1 != $3){
-				yyerror("asignacion entre datos de tipos diferentes");
-			}
-
-		   };
+			printf("21 - ASIGNACION: ID OP_ASIG EXP\n");
+			fprintf(reglas, "21 ");
+		};
 
 exp: termino
 		{
-			printf("17 - EXP: TERMINO\n");fprintf(reglas, "17 ");
-
+			printf("22 - EXP: TERMINO\n");
+			fprintf(reglas, "22 ");
         }
 	| exp OP_SUMA termino
 		{
-			printf("18 - EXP: EXP OP_SUMA TERMINO\n");fprintf(reglas, "18 ");
-			if($1 != $3){
+			printf("23 - EXP: EXP OP_SUMA TERMINO\n");
+			fprintf(reglas, "23 ");
+			printf ("Tipo 1: %s",$1->tipo);
+			printf ("Tipo 3: %s",$1->tipo);
+			/*if (strcmp($1->tipo,$3->tipo) != 0){
 				yyerror("operacion entre datos de tipos diferentes");
-			}
-			if($1 == STRING_DEF){
-				yyerror("operacion no permitida para el tipo string");
-			}
+			}*/
 
 		}
 	| exp OP_RESTA termino
 		{
-			printf("9 - EXP: ESP OP_RESTA TERMINO\n");fprintf(reglas, "19 ");
-			if($1 != $3){
+			printf("24 - EXP: ESP OP_RESTA TERMINO\n");
+			fprintf(reglas, "24 ");
+			/*if (strcmp($1->tipo,$3->tipo) != 0){
 				yyerror("operacion entre datos de tipos diferentes");
-			}
-			if($1 == STRING_DEF){
-				yyerror("operacion no permitida para el tipo string");
-			}
-
-
-		}  ;
+			}*/
+		}
+	| factor OP_CONCAT factor {
+			printf("25 - EXP: FACT OP_CONCAT FACTOR\n");
+			fprintf(reglas, "25 ");
+		} ;
 
 
 termino: factor
 		{
-			printf("20 - TERMINO: FACTOR\n");fprintf(reglas, "20 ");
+			printf("26 - TERMINO: FACTOR\n");
+			fprintf(reglas, "26 ");
+
 		}
 	| termino OP_POR factor
 		{
-			printf("21 - TERMINO: TERMINO OP_POR FACTOR\n");fprintf(reglas, "21 ");
-			if($1 != $3){
+			printf("27 - TERMINO: TERMINO OP_POR FACTOR\n");
+			fprintf(reglas, "27 ");
+		/*	if (strcmp($1->tipo,$3->tipo) != 0){
 				yyerror("operacion entre datos de tipos diferentes");
-			}
-			if($1 == STRING_DEF){
-				yyerror("operacion no permitida para el tipo string");
-			}
+			}*/
 		}
 	| termino OP_DIV factor
 		{
-			printf("22 - TERMINO: TERMINO OP_DIV FACTOR\n");fprintf(reglas, "22 ");
-			if($1 != $3){
+			printf("28 - TERMINO: TERMINO OP_DIV FACTOR\n");
+			fprintf(reglas, "28 ");
+			/*if (strcmp($1->tipo,$3->tipo) != 0){
 				yyerror("operacion entre datos de tipos diferentes");
-			}
-			if($1 == STRING_DEF){
-				yyerror("operacion no permitida para el tipo string");
-			}
+			}*/
 
 		}  ;
 
 factor: PAR_AB exp PAR_CERR
 		{
-			printf("23 - FACTOR: PAR_AB EXP PAR_CERR\n");	fprintf(reglas, "23 ");
+			printf("29 - FACTOR: PAR_AB EXP PAR_CERR\n");
+			fprintf(reglas, "29 ");
 
 		}
 	| id
 		{
-			printf("24 - FACTOR: ID\n");	fprintf(reglas, "24 ");
-
+			printf("30 - FACTOR: ID\n");
+			fprintf(reglas, "30 ");
+			printf ("%s\n",$1->nombre);
 		}
 	| cte_int
 		{
-			printf("25 - FACTOR: CTE_INT\n");	fprintf(reglas, "25 ");
-
+			printf("31 - FACTOR: CTE_INT\n");
+			fprintf(reglas, "31 ");
 		}
 	| cte_real
 		{
-			printf("26 - FACTOR: CTE_REAL\n");	fprintf(reglas, "26 ");
-
+			printf("32 - FACTOR: CTE_REAL\n");
+			fprintf(reglas, "32 ");
 		}
 	| cte_str
 		{
-			printf("27 - FACTOR: CTE_STR\n");	fprintf(reglas, "27 ");
-
-		}
-	| funcion
-		{
-			printf("28 - FACTOR: FUNCION\n");	fprintf(reglas, "28 ");
+			printf("33 - FACTOR: CTE_STR\n");
+			fprintf(reglas, "33 ");
+			printf ("%s\n",$1->nombre);
 
 		};
 
@@ -227,64 +288,81 @@ cte_real: CTE_REAL
 
 cte_str:  CTE_STR
 		{
-        };
+	    };
 
 id: ID
 		{
-		}	;
-
-
+		};
 
 funcion: falias
-		{ printf("29 - FUNCION: ALIAS\n");fprintf(reglas, "29 ");
-
+		{
+			printf("34 - FUNCION: ALIAS\n");
+			fprintf(reglas, "34 ");
 		}
 		| fbetween
 		{
-             printf("30 - FUNCION: BETWEEN\n");fprintf(reglas, "30 ");
+             printf("35 - FUNCION: BETWEEN\n");
+             fprintf(reglas, "35 ");
 		};
 
 
 
-falias: ALIAS ID PORCIENTO ID
+falias: ALIAS id PORCIENTO id
 		{
-			printf("31 - FALIAS: ALIAS ID % ID\n");fprintf(reglas, "31 ");
+			printf("36 - FALIAS: ALIAS ID PORCIENTO ID\n");
+			fprintf(reglas, "36 ");
+			if (buscarEnTS($2->nombre) != -1){
+				sprintf(error,"Identificador en alias \"%s\" ya declarado",$2->nombre);
+				yyerror(error);
+			}
 
-		}   ;
+			if (buscarEnTS($4->nombre) == -1){
+				sprintf(error,"Identificador \"%s\" no declarado",yytext);
+				yyerror(error);
+			}
+			guardarAlias($4->nombre,$2->nombre);
+		} ;
 
-fbetween: BETWEEN PAR_AB ID COMA CORC_AB exp PYCOMA exp CORC_CERR PAR_CERR
+fbetween: BETWEEN PAR_AB id COMA CORC_AB exp PYCOMA exp CORC_CERR PAR_CERR
         {
-			printf("32 - FBETWEEN:BETWEEN PAR_AB ID COMA CORC_AB exp PYCOMA exp CORC_CERR PAR_CERR\n");fprintf(reglas, "32 ");
+			printf("37 - FBETWEEN:BETWEEN PAR_AB ID COMA CORC_AB exp PYCOMA exp CORC_CERR PAR_CERR\n");
+			fprintf(reglas, "37 ");
 
 		}   ;
 
 condiciones: comp_Li
 		{
-			printf("33 - CONDICIONES: CONDICION\n");fprintf(reglas, "33 ");
+			printf("38 - CONDICIONES: CONDICION\n");fprintf(reglas, "38 ");
 		}
 	| comp_Li AND comp_Ld
 		{
-			printf("34 - CONDICIONES: CONDICION AND CONDICION\n");fprintf(reglas, "34 ");
+			printf("39 - CONDICIONES: CONDICION AND CONDICION\n");fprintf(reglas, "39 ");
 		}
 	| comp_Li OR comp_Ld
 		{
-			printf("35 - CONDICIONES: CONDICION OR CONDICION\n");fprintf(reglas, "35 ");
+			printf("40 - CONDICIONES: CONDICION OR CONDICION\n");fprintf(reglas, "40 ");
 		}
 	| NOT comp_Li
 		{
-			printf("36 - CONDICIONES: NOT CONDICION\n");fprintf(reglas, "36 ");
-		}  ;
+			printf("41 - CONDICIONES: NOT CONDICION\n");fprintf(reglas, "41 ");
+		}
+	| fbetween
+		{
+			printf("42 - CONDICIONES: FBETWEEN\n");fprintf(reglas, "42 ");
+		}
+		;
+
 
 comp_Li: condicion {
-		   }
-       ;
+
+		};
 
 comp_Ld: condicion {
-		   }
-       ;
+
+		};
 condicion: cond_Li comparador cond_Ld {
-				printf("37 - CONDICION: EXP COMPARADOR EXP\n");fprintf(reglas, "37 ");
-				    }	 ;
+			printf("43 - CONDICION: EXP COMPARADOR EXP\n");fprintf(reglas, "43 ");
+			};
 
 cond_Li: exp {
 		   }
@@ -295,44 +373,49 @@ cond_Ld: exp {
        ;
 
 
-comparador: OP_MAY 	{	$$ = OP_MAY; strcpy(opcomp,"JBE"); }
-	|	OP_MAYIG	{	$$ = OP_MAYIG; strcpy(opcomp,"JB"); }
-	|	OP_IG 		{	$$ = OP_IG; strcpy(opcomp,"JNE"); }
-	|	OP_NOIG 	{	$$ = OP_NOIG; strcpy(opcomp,"JE"); }
-	|	OP_MENIG 	{	$$ = OP_MENIG; strcpy(opcomp,"JNB"); }
-	|	OP_MEN 		{	$$ = OP_MEN; strcpy(opcomp,"JNBE"); }	;
+comparador: OP_MAY 	{	  }
+	|	OP_MAYIG	{	  }
+	|	OP_IG 		{	  }
+	|	OP_NOIG 	{	  }
+	|	OP_MENIG 	{	  }
+	|	OP_MEN 		{	  }	;
 
 
-iteracion: WHILE PAR_AB condiciones PAR_CERR{} cuerpo ENDWHILE
-		{
-			printf("38 - ITERACION: WHILE ( CONDICIONES ) CUERPO ENDWHILE\n");fprintf(reglas, "38 ");
-		}  ;
+iteracion: REPEAT cuerpo UNTIL PAR_AB condiciones PAR_CERR
+        {
+            printf("44 - ITERACION: REPEAT CUERPO UNTIL (CONDICIONES)\n");
+			fprintf(reglas, "44 ");
+        };
 
 decision: IF PAR_AB condiciones PAR_CERR cuerpo ENDIF
 		{
-			printf("39 - DECISION: IF ( CONDICIONES ) CUERPO ENDIF\n");fprintf(reglas, "39 ");
+			printf("45 - DECISION: IF ( CONDICIONES ) CUERPO ENDIF\n");
+			fprintf(reglas, "45 ");
 		}
 		|IF PAR_AB condiciones PAR_CERR cuerpo
 		{
-		printf("40 - DECISION: IF ( CONDICIONES ) CUERPO ELSE CUERPO ENDIF\n");fprintf(reglas, "40 ");
+			printf("46 - DECISION: IF ( CONDICIONES ) CUERPO ELSE CUERPO ENDIF\n");
+			fprintf(reglas, "46 ");
 		}
 		ELSE cuerpo  ENDIF
-		{		}
+		{
 
-		;
+		};
 
 io: READ id
 		{
-			printf("41 - IO: READ ID\n");fprintf(reglas, "41 ");
+			printf("47 - IO: READ ID\n");
+			fprintf(reglas, "47 ");
 
 		}
 	| WRITE id
 		{
-			printf("42 - IO: WRITE ID\n");fprintf(reglas, "42 ");
+			printf("48 - IO: WRITE ID\n");fprintf(reglas, "48 ");
 		}
 	| WRITE cte_str
 		{
-			printf("43 - IO: WRITE CTE_STR\n");fprintf(reglas, "43 ");
+			printf("49 - IO: WRITE CTE_STR\n");
+			fprintf(reglas, "49 ");
 		}  ;
 %%
 
@@ -370,8 +453,6 @@ int main(int argc,char *argv[])
 
 //sino se define yyerror tira error bison
 int yyerror(const char * msj) {
-
 	printf("ERROR: %s; linea nro: %d\n", msj, linea);
 	exit(-1);
 }
-

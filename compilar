@@ -1,0 +1,16 @@
+#!/bin/bash -l
+rm lex.yy.c
+rm y.tab.c
+rm y.output
+rm y.tab.h
+rm compilador
+
+if [[ $1 != '-c' ]];
+then
+        bison -dyv ./sintactico.y
+		flex ./lexico.l
+		g++ y.tab.c lex.yy.c -o compilador -ll
+fi
+
+
+

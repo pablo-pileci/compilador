@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define TIPO_ENTERO 0
+#define TIPO_REAL 1
+#define TIPO_STRING 2
+#define ERROR_TIPO 3
 
 int ts_Operacion[3][3];
 
@@ -9,7 +13,7 @@ int verificarTipo(char, int, int);
 
 void cargarTablaSintesis()
 {
-      ts_Operacion[TIPO_ENTERO][TIPO_ENTERO] =  TIPO_ENTERO;
+     ts_Operacion[TIPO_ENTERO][TIPO_ENTERO] =  TIPO_ENTERO;
      ts_Operacion[TIPO_ENTERO][TIPO_REAL] =  ERROR_TIPO;
      ts_Operacion[TIPO_ENTERO][TIPO_STRING] = ERROR_TIPO;
      ts_Operacion[TIPO_REAL][TIPO_ENTERO] =  ERROR_TIPO;
