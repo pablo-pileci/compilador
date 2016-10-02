@@ -257,7 +257,6 @@ factor: PAR_AB exp PAR_CERR
 		{
 			printf("30 - FACTOR: ID\n");
 			fprintf(reglas, "30 ");
-			printf ("%s\n",$1->nombre);
 		}
 	| cte_int
 		{
