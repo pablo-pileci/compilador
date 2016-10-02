@@ -4,7 +4,7 @@
 //estructura de simbolos de la tabla
 typedef struct{
     char *nombre;
-    int tipo;
+    char *tipo;
     char *valor;
     int longitud;
     char *alias;
