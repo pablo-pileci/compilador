@@ -7,7 +7,7 @@ rm compilador
 
 if [[ $1 != '-c' ]];
 then
-        bison -dyv ./sintactico.y
+        bison -dyv ./Sintactico.y
 		flex ./lexico.l
 		g++ y.tab.c lex.yy.c -o compilador -ll
 fi
