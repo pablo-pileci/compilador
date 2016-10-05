@@ -3,18 +3,30 @@
 	#define YYSTYPE t_simbolo *
 	#include "lexico.h"
 	FILE *reglas=NULL;
+	FILE *intermedia=NULL;
 	char error[1000];
 	#define CANTVAR 200
 
     #include "ttipos.h"
-
+	#include <vector>
+	
     #define TIPO_ENTERO 0
     #define TIPO_REAL 1
     #define TIPO_STRING 2
     #define ERROR_TIPO 3
 
-%}
+    typedef struct  {
+    	int pos;
+    	char * cad;
+    } tElementoPolaca;
+	std::vector<tElementoPolaca> tiraPolaca;
+	int posActualPolaca = -1,x;
+	char auxPolaca[10],auxComparador[5];
+	struct tpila * pilaPolaca;
 
+    void insertar_en_polaca(char *);
+    void escribirPolaca();
+%}
 
 %token  ID
 		CTE_INT
@@ -75,16 +87,19 @@ programa: declaracion cuerpo
 			printf("0  - (START) PROGRAMA: DECLARACION CUERPO\n\n***** COMPILACION EXITOSA *****\n");
 			fprintf(reglas, "0 ");
 			escribirTS();
+			escribirPolaca();	
 		} |
 		cuerpo {
 			printf("1  - (START) PROGRAMA: CUERPO\n\n***** COMPILACION EXITOSA *****\n");
 			fprintf(reglas, "1 ");
 			escribirTS();
+			escribirPolaca();
 		}  |
 		declaracion {
 			printf("2  - (START) PROGRAMA: DECLARACION\n\n***** COMPILACION EXITOSA *****\n");
 			fprintf(reglas, "2 ");
 			escribirTS();
+			
 		};
 
 cuerpo: sentencia {
@@ -191,6 +206,10 @@ asignacion: id OP_ASIG exp
 		{
 			printf("21 - ASIGNACION: ID OP_ASIG EXP\n");
 			fprintf(reglas, "21 ");
+			insertar_en_polaca($1->nombre);
+			strcpy(auxPolaca,":=");
+			insertar_en_polaca(auxPolaca);
+			
 		};
 
 exp: termino
@@ -202,24 +221,22 @@ exp: termino
 		{
 			printf("23 - EXP: EXP OP_SUMA TERMINO\n");
 			fprintf(reglas, "23 ");
-			printf ("Tipo 1: %s",$1->tipo);
-			printf ("Tipo 3: %s",$1->tipo);
-			/*if (strcmp($1->tipo,$3->tipo) != 0){
-				yyerror("operacion entre datos de tipos diferentes");
-			}*/
+			strcpy(auxPolaca,"+");
+			insertar_en_polaca(auxPolaca);
 
 		}
 	| exp OP_RESTA termino
 		{
 			printf("24 - EXP: ESP OP_RESTA TERMINO\n");
 			fprintf(reglas, "24 ");
-			/*if (strcmp($1->tipo,$3->tipo) != 0){
-				yyerror("operacion entre datos de tipos diferentes");
-			}*/
+			strcpy(auxPolaca,"-");
+			insertar_en_polaca(auxPolaca);
 		}
 	| factor OP_CONCAT factor {
 			printf("25 - EXP: FACT OP_CONCAT FACTOR\n");
 			fprintf(reglas, "25 ");
+			strcpy(auxPolaca,"++");
+			insertar_en_polaca(auxPolaca);
 		} ;
 
 
@@ -233,18 +250,16 @@ termino: factor
 		{
 			printf("27 - TERMINO: TERMINO OP_POR FACTOR\n");
 			fprintf(reglas, "27 ");
-		/*	if (strcmp($1->tipo,$3->tipo) != 0){
-				yyerror("operacion entre datos de tipos diferentes");
-			}*/
+			strcpy(auxPolaca,"*");
+			insertar_en_polaca(auxPolaca);
 		}
 	| termino OP_DIV factor
 		{
 			printf("28 - TERMINO: TERMINO OP_DIV FACTOR\n");
 			fprintf(reglas, "28 ");
-			/*if (strcmp($1->tipo,$3->tipo) != 0){
-				yyerror("operacion entre datos de tipos diferentes");
-			}*/
-
+			strcpy(auxPolaca,"/");
+			insertar_en_polaca(auxPolaca);
+			
 		}  ;
 
 factor: PAR_AB exp PAR_CERR
@@ -257,24 +272,26 @@ factor: PAR_AB exp PAR_CERR
 		{
 			printf("30 - FACTOR: ID\n");
 			fprintf(reglas, "30 ");
-			printf ("%s\n",$1->nombre);
+			insertar_en_polaca($1->nombre);
+			
 		}
 	| cte_int
 		{
 			printf("31 - FACTOR: CTE_INT\n");
 			fprintf(reglas, "31 ");
+			insertar_en_polaca($1->nombre);
 		}
 	| cte_real
 		{
 			printf("32 - FACTOR: CTE_REAL\n");
 			fprintf(reglas, "32 ");
+			insertar_en_polaca($1->nombre);
 		}
 	| cte_str
 		{
 			printf("33 - FACTOR: CTE_STR\n");
 			fprintf(reglas, "33 ");
-			printf ("%s\n",$1->nombre);
-
+			insertar_en_polaca($1->nombre);
 		};
 
 
@@ -362,6 +379,13 @@ comp_Ld: condicion {
 		};
 condicion: cond_Li comparador cond_Ld {
 			printf("43 - CONDICION: EXP COMPARADOR EXP\n");fprintf(reglas, "43 ");
+			
+			apilar(pilaPolaca,posActualPolaca+2);
+			strcpy(auxPolaca,"CMP");
+			insertar_en_polaca(auxPolaca);
+			strcpy(auxPolaca,"");
+			insertar_en_polaca(auxPolaca);		
+			insertar_en_polaca(auxComparador);	
 			};
 
 cond_Li: exp {
@@ -373,12 +397,12 @@ cond_Ld: exp {
        ;
 
 
-comparador: OP_MAY 	{	  }
-	|	OP_MAYIG	{	  }
-	|	OP_IG 		{	  }
-	|	OP_NOIG 	{	  }
-	|	OP_MENIG 	{	  }
-	|	OP_MEN 		{	  }	;
+comparador: OP_MAY 	{	strcpy(auxComparador,"BLE");  }
+	|	OP_MAYIG	{	strcpy(auxComparador,"BLT");  }
+	|	OP_IG 		{	strcpy(auxComparador,"BNE");  }
+	|	OP_NOIG 	{	strcpy(auxComparador,"BEQ");  }
+	|	OP_MENIG 	{	strcpy(auxComparador,"BGT");  }
+	|	OP_MEN 		{	strcpy(auxComparador,"BGE");  }	;
 
 
 iteracion: REPEAT cuerpo UNTIL PAR_AB condiciones PAR_CERR
@@ -387,7 +411,10 @@ iteracion: REPEAT cuerpo UNTIL PAR_AB condiciones PAR_CERR
 			fprintf(reglas, "44 ");
         };
 
-decision: IF PAR_AB condiciones PAR_CERR cuerpo ENDIF
+decision: IF PAR_AB condiciones PAR_CERR cuerpo {
+			x = desapilar(pilaPolaca);
+			snprintf(tiraPolaca.at(x).cad, 10, "%d", posActualPolaca + 1);
+} ENDIF
 		{
 			printf("45 - DECISION: IF ( CONDICIONES ) CUERPO ENDIF\n");
 			fprintf(reglas, "45 ");
@@ -396,26 +423,45 @@ decision: IF PAR_AB condiciones PAR_CERR cuerpo ENDIF
 		{
 			printf("46 - DECISION: IF ( CONDICIONES ) CUERPO ELSE CUERPO ENDIF\n");
 			fprintf(reglas, "46 ");
+		
+			x = desapilar(pilaPolaca);
+			snprintf(tiraPolaca.at(x).cad, 10, "%d", posActualPolaca + 3);
+			apilar(pilaPolaca,posActualPolaca+1);
+			strcpy(auxPolaca,"");
+			insertar_en_polaca(auxPolaca);	
+			strcpy(auxPolaca,"BI");
+			insertar_en_polaca(auxPolaca);	
+			
 		}
 		ELSE cuerpo  ENDIF
-		{
-
+		{	
+			x = desapilar(pilaPolaca);
+			snprintf(tiraPolaca.at(x).cad, 10, "%d", posActualPolaca + 1);
 		};
 
 io: READ id
 		{
 			printf("47 - IO: READ ID\n");
 			fprintf(reglas, "47 ");
+			insertar_en_polaca($2->nombre);
+			strcpy(auxPolaca,"READ");
+			insertar_en_polaca(auxPolaca);
 
 		}
 	| WRITE id
 		{
 			printf("48 - IO: WRITE ID\n");fprintf(reglas, "48 ");
+			insertar_en_polaca($2->nombre);
+			strcpy(auxPolaca,"WRITE");
+			insertar_en_polaca(auxPolaca);
 		}
 	| WRITE cte_str
 		{
 			printf("49 - IO: WRITE CTE_STR\n");
 			fprintf(reglas, "49 ");
+			insertar_en_polaca($2->nombre);
+			strcpy(auxPolaca,"WRITE");
+			insertar_en_polaca(auxPolaca);
 		}  ;
 %%
 
@@ -438,6 +484,7 @@ int main(int argc,char *argv[])
 		}
 		else
 		{
+			crearPila(&pilaPolaca);
 			while(!feof(yyin))
 			{
 				yyparse();
@@ -455,4 +502,26 @@ int main(int argc,char *argv[])
 int yyerror(const char * msj) {
 	printf("ERROR: %s; linea nro: %d\n", msj, linea);
 	exit(-1);
+}
+
+void insertar_en_polaca(char * cadena) {
+	if (declarando == 0){
+		tElementoPolaca * elementoAInsertar = (tElementoPolaca *) malloc (sizeof (tElementoPolaca));
+		elementoAInsertar->cad = (char *) malloc ((30+1) * sizeof(char));
+		strcpy(elementoAInsertar->cad,cadena);
+		elementoAInsertar->pos = ++posActualPolaca;
+		tiraPolaca.push_back(*elementoAInsertar);
+	}
+}
+
+void escribirPolaca() {
+	if ((intermedia  = fopen("intermedia.txt",  "w")) == NULL){
+			printf("\nNo se puede crear el archivo intermedia.txt\n");
+	}
+	else {
+		for (std::vector<tElementoPolaca>::iterator it = tiraPolaca.begin() ; it != tiraPolaca.end(); ++it){
+			fprintf(intermedia, "%s ",it->cad);
+		}
+    	fclose(intermedia);
+	}
 }

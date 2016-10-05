@@ -2,6 +2,7 @@ DECVAR
 	a,a2: Integer
 ENDDEC
 
-a3 := a2 {
-b := 10	
-}
+IF (a*7+b < b+c*4)
+	a:= a+1
+ENDIF
+c:=15

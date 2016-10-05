@@ -318,7 +318,7 @@ t_simbolo* buscarSimbolo(const char* nombre){
 		// Obtenemos un iterador al comienzo de la lista
 		it = listSimbolos.begin();
 		// Buscamos el elemento
-		while( it != listSimbolos.end() && strcmp((*it).nombre,nombre)!=0){
+		while( it != listSimbolos.end() && strcmp((*it).nombre,nombre)!=0 && strcmp((*it).alias,nombre)){
 			it++;
 		}
 		// Si no se encontro el elemento

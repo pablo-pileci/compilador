@@ -1,20 +1,8 @@
 Nombre                           Alias          Tipo           Valor                          Longitud
 ----------------------------------------------------------------------------------------------------------
-a                                a3                                                           0    
-b                                                                                             0    
-e                                                                                             0    
-c                                                                                             0    
-d                                                                                             0    
-_10                                                            10                             0    
-_20                                                            20                             0    
-_"cadena"                                                      "cadena"                       8    
-_"de prueba"                                                   "de prueba"                    11   
-_2                                                             2                              0    
-_20                                                            20                             0    
+a                                                                                             0    
+a2                                                                                            0    
+_7                                                             7                              0    
+_4                                                             4                              0    
 _1                                                             1                              0    
-_0                                                             0                              0    
-_0                                                             0                              0    
-_"a es igual a cero"                                           "a es igual a cero"            19   
-_"a no es igual a cero"                                        "a no es igual a cero"         22   
-_5                                                             5                              0    
-_8                                                             8                              0    
+_15                                                            15                             0    
