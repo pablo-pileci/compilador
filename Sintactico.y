@@ -342,7 +342,38 @@ falias: ALIAS id PORCIENTO id
 			guardarAlias($4->nombre,$2->nombre);
 		} ;
 
-fbetween: BETWEEN PAR_AB id COMA CORC_AB exp PYCOMA exp CORC_CERR PAR_CERR
+fbetween: BETWEEN PAR_AB id {
+	insertar_en_polaca($3->nombre);
+}
+
+ COMA CORC_AB exp {
+				dato.clave = posActualPolaca+2;
+				dato.inAnd = 0;
+				mostrarPila(pilaPolaca);
+				apilar(pilaPolaca,dato);
+				
+				strcpy(auxPolaca,"CMP");
+				insertar_en_polaca(auxPolaca);
+				strcpy(auxPolaca,"");
+				insertar_en_polaca(auxPolaca);		
+				strcpy(auxComparador,"BLE");
+				insertar_en_polaca(auxComparador);
+				insertar_en_polaca($3->nombre);
+				
+} PYCOMA exp
+	{			
+				dato.clave = posActualPolaca+2;
+				dato.inAnd = 1;
+				apilar(pilaPolaca,dato);
+				strcpy(auxPolaca,"CMP");
+				insertar_en_polaca(auxPolaca);
+				strcpy(auxPolaca,"");
+				insertar_en_polaca(auxPolaca);		
+				strcpy(auxComparador,"BGE");
+				insertar_en_polaca(auxComparador);
+	}
+
+ CORC_CERR PAR_CERR
         {
 			printf("37 - FBETWEEN:BETWEEN PAR_AB ID COMA CORC_AB exp PYCOMA exp CORC_CERR PAR_CERR\n");
 			fprintf(reglas, "37 ");
@@ -440,8 +471,30 @@ comparador: OP_MAY 	{	strcpy(auxComparador,"BLE");  }
 	|	OP_MEN 		{	strcpy(auxComparador,"BGE");  }	;
 
 
-iteracion: REPEAT cuerpo UNTIL PAR_AB condiciones PAR_CERR
-        {
+iteracion: REPEAT 
+{			
+			dato.clave = posActualPolaca+1;
+			dato.inAnd = 0;
+			apilar(pilaPolaca,dato);
+}
+cuerpo UNTIL PAR_AB {printf("Antes\n");mostrarPila(pilaPolaca);} condiciones {printf("Despues\n");mostrarPila(pilaPolaca);} PAR_CERR
+        {	
+
+
+        	dato = desapilar(pilaPolaca);
+        	snprintf(tiraPolaca.at(dato.clave).cad, 10, "%d", posActualPolaca + 3);
+
+			if (dato.inAnd == 1){
+				dato = desapilar(pilaPolaca);
+				snprintf(tiraPolaca.at(dato.clave).cad, 10, "%d", posActualPolaca + 3);
+			}
+
+        	dato = desapilar(pilaPolaca);
+			snprintf(auxPolaca, 10, "%d", dato.clave);
+        	insertar_en_polaca(auxPolaca);	
+
+			strcpy(auxPolaca,"BI");
+			insertar_en_polaca(auxPolaca);	
             printf("44 - ITERACION: REPEAT CUERPO UNTIL (CONDICIONES)\n");
 			fprintf(reglas, "44 ");
         };
