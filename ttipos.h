@@ -66,19 +66,21 @@ int verificarTipo(char oper, int indLeft, int indRight)
 //////////PILA///////////
 
 /* declaracion */
+struct tdato{
+  int clave,inAnd;
+};
 struct tpila{
-  int clave;
+  struct tdato info;
   struct tpila *sig;
 };
 
 /* prototipos e implementacion */
 int crearPila(struct tpila **pila);
 int vacia(struct tpila *pila);
-void apilar(struct tpila *pila, int elem);
-int desapilar(struct tpila *pila);
+void apilar(struct tpila *pila, struct tdato elem);
+struct tdato desapilar(struct tpila *pila);
 
 void mostrarPila(struct tpila *pila);
-
 
 int crearPila(struct tpila **pila)
 {
@@ -95,12 +97,12 @@ int vacia(struct tpila *pila)
   return (pila->sig == NULL);
 }
 
-void apilar(struct tpila *pila, int elem)
+void apilar(struct tpila *pila, struct tdato elem)
 {
   struct tpila *nuevo;
 
   nuevo = (struct tpila *) malloc(sizeof(struct tpila));
-  nuevo->clave = elem;
+  nuevo->info = elem;
   nuevo->sig = pila->sig;
   pila->sig = nuevo;
 
@@ -109,27 +111,26 @@ void apilar(struct tpila *pila, int elem)
 void mostrarPila(struct tpila *pila)
 {
 
-
   struct tpila *aux = pila;
   int valor;
 
    printf("\n----------PILA-----------");
 
   while (aux != NULL){
-        valor = aux->clave;
+        valor = aux->info.clave;
         printf("\n Elemento: %d", valor);
         aux = aux->sig;
         }
     printf("\n--------FIN DE PILA---------\n\n");
 }
 
-int desapilar(struct tpila *pila)
+struct tdato desapilar(struct tpila *pila)
 {
   struct tpila *aux;
-  int valor;
+  struct tdato valor;
 
   aux = pila->sig;
-  valor = aux->clave;
+  valor = aux->info;
   pila->sig = aux->sig;
   free(aux);
   return valor;

@@ -20,12 +20,15 @@
     	char * cad;
     } tElementoPolaca;
 	std::vector<tElementoPolaca> tiraPolaca;
-	int posActualPolaca = -1,x;
+	int posActualPolaca = -1,x,inAnd=0,inOr=0;
 	char auxPolaca[10],auxComparador[5];
 	struct tpila * pilaPolaca;
+	struct tdato dato;
 
     void insertar_en_polaca(char *);
+    void insertar_en_polaca(char *,int,int);
     void escribirPolaca();
+    void escribirPolacaPorLinea();
 %}
 
 %token  ID
@@ -87,13 +90,13 @@ programa: declaracion cuerpo
 			printf("0  - (START) PROGRAMA: DECLARACION CUERPO\n\n***** COMPILACION EXITOSA *****\n");
 			fprintf(reglas, "0 ");
 			escribirTS();
-			escribirPolaca();	
+			escribirPolacaPorLinea();	
 		} |
 		cuerpo {
 			printf("1  - (START) PROGRAMA: CUERPO\n\n***** COMPILACION EXITOSA *****\n");
 			fprintf(reglas, "1 ");
 			escribirTS();
-			escribirPolaca();
+			escribirPolacaPorLinea();
 		}  |
 		declaracion {
 			printf("2  - (START) PROGRAMA: DECLARACION\n\n***** COMPILACION EXITOSA *****\n");
@@ -112,7 +115,6 @@ cuerpo: sentencia {
 			printf("4  - CUERPO: CUERPO SENTENCIA\n");
 			fprintf(reglas, "4 ");
 		};
-
 
 sentencia: asignacion
 		{
@@ -351,12 +353,27 @@ condiciones: comp_Li
 		{
 			printf("38 - CONDICIONES: CONDICION\n");fprintf(reglas, "38 ");
 		}
-	| comp_Li AND comp_Ld
+	| comp_Li AND {
+		inAnd=1;
+	}comp_Ld
 		{
 			printf("39 - CONDICIONES: CONDICION AND CONDICION\n");fprintf(reglas, "39 ");
 		}
-	| comp_Li OR comp_Ld
-		{
+	| comp_Li OR {
+			inOr = 1;
+			strcpy(auxPolaca,"");
+			insertar_en_polaca(auxPolaca);	
+			strcpy(auxPolaca,"BI");
+			insertar_en_polaca(auxPolaca);	
+			dato = desapilar(pilaPolaca);	
+			snprintf(tiraPolaca.at(dato.clave).cad, 10, "%d", posActualPolaca + 1);
+
+			dato.clave = posActualPolaca-1;
+			dato.inAnd = 0;
+			apilar(pilaPolaca,dato);
+	} comp_Ld
+		{  	
+			
 			printf("40 - CONDICIONES: CONDICION OR CONDICION\n");fprintf(reglas, "40 ");
 		}
 	| NOT comp_Li
@@ -379,8 +396,26 @@ comp_Ld: condicion {
 		};
 condicion: cond_Li comparador cond_Ld {
 			printf("43 - CONDICION: EXP COMPARADOR EXP\n");fprintf(reglas, "43 ");
-			
-			apilar(pilaPolaca,posActualPolaca+2);
+			if (inAnd == 1){
+				dato.clave = posActualPolaca+2;
+				dato.inAnd = 1;
+				apilar(pilaPolaca,dato);
+				inAnd = 0;
+			}
+			else if (inOr == 1){
+				dato = desapilar(pilaPolaca);
+				snprintf(tiraPolaca.at(dato.clave).cad, 10, "%d", posActualPolaca + 4);
+				inOr = 0;
+
+				dato.clave = posActualPolaca+2;
+				dato.inAnd = 0;
+				apilar(pilaPolaca,dato);
+			}
+			else{
+				dato.clave = posActualPolaca+2;
+				dato.inAnd = 0;
+				apilar(pilaPolaca,dato);
+			}
 			strcpy(auxPolaca,"CMP");
 			insertar_en_polaca(auxPolaca);
 			strcpy(auxPolaca,"");
@@ -412,8 +447,16 @@ iteracion: REPEAT cuerpo UNTIL PAR_AB condiciones PAR_CERR
         };
 
 decision: IF PAR_AB condiciones PAR_CERR cuerpo {
-			x = desapilar(pilaPolaca);
-			snprintf(tiraPolaca.at(x).cad, 10, "%d", posActualPolaca + 1);
+			
+			dato = desapilar(pilaPolaca);
+			snprintf(tiraPolaca.at(dato.clave).cad, 10, "%d", posActualPolaca + 1);
+			if (dato.inAnd == 1){
+				dato = desapilar(pilaPolaca);
+				snprintf(tiraPolaca.at(dato.clave).cad, 10, "%d", posActualPolaca + 1);
+			}
+
+			
+
 } ENDIF
 		{
 			printf("45 - DECISION: IF ( CONDICIONES ) CUERPO ENDIF\n");
@@ -424,9 +467,15 @@ decision: IF PAR_AB condiciones PAR_CERR cuerpo {
 			printf("46 - DECISION: IF ( CONDICIONES ) CUERPO ELSE CUERPO ENDIF\n");
 			fprintf(reglas, "46 ");
 		
-			x = desapilar(pilaPolaca);
-			snprintf(tiraPolaca.at(x).cad, 10, "%d", posActualPolaca + 3);
-			apilar(pilaPolaca,posActualPolaca+1);
+			dato = desapilar(pilaPolaca);
+			snprintf(tiraPolaca.at(dato.clave).cad, 10, "%d", posActualPolaca + 3);
+			if (dato.inAnd == 1){
+				dato = desapilar(pilaPolaca);
+				snprintf(tiraPolaca.at(dato.clave).cad, 10, "%d", posActualPolaca + 3);
+			}
+			dato.clave = posActualPolaca+1;
+			dato.inAnd = 0;
+			apilar(pilaPolaca,dato);
 			strcpy(auxPolaca,"");
 			insertar_en_polaca(auxPolaca);	
 			strcpy(auxPolaca,"BI");
@@ -435,8 +484,8 @@ decision: IF PAR_AB condiciones PAR_CERR cuerpo {
 		}
 		ELSE cuerpo  ENDIF
 		{	
-			x = desapilar(pilaPolaca);
-			snprintf(tiraPolaca.at(x).cad, 10, "%d", posActualPolaca + 1);
+			dato = desapilar(pilaPolaca);
+			snprintf(tiraPolaca.at(dato.clave).cad, 10, "%d", posActualPolaca + 1);
 		};
 
 io: READ id
@@ -520,7 +569,22 @@ void escribirPolaca() {
 	}
 	else {
 		for (std::vector<tElementoPolaca>::iterator it = tiraPolaca.begin() ; it != tiraPolaca.end(); ++it){
-			fprintf(intermedia, "%s ",it->cad);
+			fprintf(intermedia, "%s \n",it->cad);
+		}
+    	fclose(intermedia);
+	}
+}
+
+void escribirPolacaPorLinea() {
+	if ((intermedia  = fopen("intermedia.txt",  "w")) == NULL){
+			printf("\nNo se puede crear el archivo intermedia.txt\n");
+	}
+	else {
+		int i = 0;
+		for (std::vector<tElementoPolaca>::iterator it = tiraPolaca.begin() ; it != tiraPolaca.end(); ++it){
+			fprintf(intermedia, "%d - %s \n",i,it->cad);
+			i++;
+			
 		}
     	fclose(intermedia);
 	}
