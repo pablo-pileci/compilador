@@ -10,6 +10,15 @@ typedef struct{
     char *alias;
 }t_simbolo;
 
+typedef struct{
+    char nombre[32];
+    char tipo[32];
+    char valor[32];
+    int longitud;
+    char alias[32];
+}t_data;
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -53,15 +62,7 @@ int buscarEnTS(const char*);
 t_simbolo* buscarSimbolo(const char* nombre);
 int obtenerTipo(int);
 void escribirTS();
-int hexaAdec(const char *);
-int binaAdec(const char *);
-
-typedef struct{
-    char nombre[32];
-    char tipo[32];
-    char valor[32];
-    int longitud;
-    char alias[32];
-}data;
+int agregarTipo(const char*, const char*);
+void tsEscribirBinario();
 
 #endif

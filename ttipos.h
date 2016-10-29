@@ -30,7 +30,7 @@ void cargarTablaSintesis()
 int verificarTipo(char oper, int indLeft, int indRight)
 {
  	 switch(ts_Operacion[indLeft][indRight])
-	 {
+	 { 
 	    case ERROR_TIPO:
 			 printf("\n\t ERROR: de incompatibilidad de tipos\n");
 			 system("PAUSE");
@@ -41,13 +41,6 @@ int verificarTipo(char oper, int indLeft, int indRight)
           {
                 return ts_Operacion[indLeft][indRight];
              }
-
-             else
-
-            if (oper == '@')
-            	{
-                  return ts_Operacion[indLeft][indRight];
-                }
 
              else
 

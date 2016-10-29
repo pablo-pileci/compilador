@@ -4,6 +4,9 @@ rm y.tab.c
 rm y.output
 rm y.tab.h
 rm compilador
+rm ts_bin.dat
+rm reglas.txt
+rm intermedia.txt
 
 if [[ $1 != '-c' ]];
 then

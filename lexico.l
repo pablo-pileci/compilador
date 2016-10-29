@@ -150,6 +150,8 @@ COMENTARIO  {COMENT_AB}([^\/]|(\/[^-]))*{COMENT_CERR}
 }
 {CTE_STR}     {
 	validar(3);
+	yytext[strlen(yytext)-1] = '\0';
+    yytext++;
 	agregarSimbolo(yytext,3);
 	agregar_nop_lista_tokens("CTE_STR");
 	strcpy(constantes,"_");
@@ -236,11 +238,12 @@ int agregarSimbolo(const char* nombre, int tipo){
 	int pos=1;			//Posicion del simbolo en la tabla
 	t_simbolo* info;
     char aux[32];
-	pos = buscarEnTS(nombre);
+    strcpy(aux,"_");
+    strcat(aux,nombre);
+	pos = buscarEnTS(aux);
 	// Si el elemento no se encuentra en la lista, lo cargamos haciendo uso de la variable info
 
 	if ( pos == -1 ){
-
 		info = ( t_simbolo* )malloc( sizeof(t_simbolo) );
 		if ( !info ){
 			return -1;
@@ -259,10 +262,11 @@ int agregarSimbolo(const char* nombre, int tipo){
 			strcpy( info->nombre, nombre);
 		}
         else{
+
             strcpy( info->valor, nombre);
             sprintf(aux,"_%s",yytext);
             strcpy( info->nombre, aux);
-            }
+        }
 
 		if (tipo==3){
             info->longitud = strlen(yytext);
@@ -271,6 +275,7 @@ int agregarSimbolo(const char* nombre, int tipo){
 		pos = listSimbolos.size();
 		free(info);
 	}
+
 	return pos;
 }
 
@@ -343,11 +348,48 @@ void escribirTS() {
 	fprintf(ptrTs,"----------------------------------------------------------------------------------------------------------\n");
 	// Recorro la lista de simbolos y voy mostrando todos sus atributos
 	for( list<t_simbolo>::iterator it = listSimbolos.begin(); it != listSimbolos.end(); ++it){
-		fprintf(ptrTs,"%-33s", it->nombre);
-		fprintf(ptrTs,"%-15s", it->alias);
-		fprintf(ptrTs,"%-15s", it->tipo);
-		fprintf(ptrTs,"%-31s", it->valor);
-		fprintf(ptrTs,"%-5d\n", it->longitud);
+		fprintf(ptrTs,"%-33s", (*it).nombre);
+		fprintf(ptrTs,"%-15s", (*it).alias);
+		fprintf(ptrTs,"%-15s", (*it).tipo);
+		fprintf(ptrTs,"%-31s", (*it).valor);
+		fprintf(ptrTs,"%-5d\n",(*it).longitud);
 	}
 	fclose(ptrTs);
+
+	tsEscribirBinario();
+}
+
+int agregarTipo(const char* nombre, const char* tipo){
+	int pos = -1;
+	list<t_simbolo>::iterator it;
+	if(!listSimbolos.empty()){
+		pos = 1;
+		it = listSimbolos.begin();
+		while( it != listSimbolos.end() && strcmp((*it).nombre,nombre)!=0){
+			it++;
+			pos++;
+		}
+		strcpy((*it).tipo, tipo);
+    }
+    return pos;
+}
+
+void tsEscribirBinario(){
+	t_data simbolo;
+	FILE *ptrTsBin;
+	if ((ptrTsBin = fopen("ts_bin.dat","wb")) == NULL)
+	{
+		printf("\nNo se puede abrir el archivo: ts_bin.dat\n");
+		exit(-1);
+	}
+
+	for( list<t_simbolo>::iterator it = listSimbolos.begin(); it != listSimbolos.end(); ++it){
+		simbolo.longitud = (*it).longitud;
+		strcpy(simbolo.nombre,(*it).nombre);
+		strcpy(simbolo.tipo,(*it).tipo);
+		strcpy(simbolo.valor,(*it).valor);
+		strcpy(simbolo.alias,(*it).alias);
+		fwrite(&simbolo,sizeof(t_data),1,ptrTsBin);
+	}
+	fclose(ptrTsBin);
 }
