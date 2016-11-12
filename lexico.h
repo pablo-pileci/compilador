@@ -1,6 +1,7 @@
 #ifndef g_lexico_h
 #define g_lexico_h
 
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -30,23 +31,17 @@ typedef struct{
     char alias[32];
 }t_data;
 
-
-
-// estructura de un elemento de la lista
 struct elemento_de_lista {
     char dato[1000]; // donde la info va
     char tipo[50];
     // doblemente enlazada
-    struct elemento_de_lista* siguiente; // puntero
-    struct elemento_de_lista* anterior; // puntero
+    struct elemento_de_lista *siguiente; // puntero
+    struct elemento_de_lista *anterior; // puntero
 }; // <= ojo con el punto y coma
 
-// redefinición por brevedad
 typedef struct elemento_de_lista elem;
 
 #include "y.tab.h"
-
-
 using namespace std;
 
 #define MAX_ENTERO 65535
@@ -78,14 +73,32 @@ int agregarSimbolo(const char*, int);
 void guardarAlias(const char*, const char*);
 int buscarEnTS(const char*);
 int buscarAlias(const char*);
-t_simbolo* buscarSimbolo(const char* nombre);
+t_simbolo* buscarSimbolo(const char* );
 int obtenerTipo(int);
 void escribirTS();
 int agregarTipo(const char*, const char*);
 void tsEscribirBinario();
+void generarAssembler();
+void cargarTablaSimboloYModificarNombres();
+void LeerYGuardarIntemedia();
+void escribirAssembler();
+void agregarCabecera();
+void agregarDeclaracion();
+void agregarFunciones();
+FILE* openFilePolaca(char *, char *);
+void insertarAssemblerPolacaEnAssemblerFinal();
+void agregarFin();
 
-
-
-
-
+void renameSimbolo(char *simbolo);
+void procesar(char *);
+int pop(elem** );
+elem* push(char* , char* , elem* );
+t_data BuscarEnTSxNombre(char *);
+int esOperadorBinario(char *);
+char* obtenerComando(char *);
+int esNumero(char *);
+int esSalto(char *);
+void imprimir_pila(elem* );
+int eliminar_elemento_pila(elem* ,elem** );
+void imprime_elemento(elem* ); 
 #endif

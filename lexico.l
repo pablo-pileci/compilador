@@ -1,6 +1,7 @@
 %{
 	#define YYSTYPE t_simbolo *
     #include "lexico.h"
+	
 
     FILE *f;
     //**Lista que contiene la tabla de simbolos**//
@@ -395,89 +396,6 @@ void tsEscribirBinario(){
 	fclose(ptrTsBin);
 }
 
-// eliminar todos los elementos de la lista
-// opcion vaciar
-elem* borrar_pila(elem* esto) {
-	elem* temp; // auxiliar 
-	// iterativa
-	while (esto != NULL) {
-		temp = esto->siguiente;
-		free(esto); // liberar
-		esto = temp; // avanza al siguinte
-	}
-	return NULL; // que ya no hay lista
-}
-
-// devuelve si o no se pudo eliminar
-// (no se puede eliminar si no esta)
-// valor cuyo elemento hay que eliminar
-// (unicamente elimina el primer elemento
-// cuyo valor coincide)
-// elemento en el cual estamos buscando = aqui
-int eliminar_elemento_pila(elem* aqui,
-	elem** inicio) {
-	if (aqui != NULL) { // si hay algo
-		*inicio = aqui->siguiente;
-		free(aqui); // borrame      return TRUE; // eliminacion exitosa
-		return 1;
-	}
-	return -1;
-}
-
-// interface para llamadas mas bonitas
-int pop(elem** inicio) {
-	return eliminar_elemento_pila(*inicio, inicio);
-}
-
-void imprime_elemento(elem* esto) {
-	// iterativa
-	while (esto != NULL) {
-		printf("%s - ", esto->dato);
-		//printf("tipo: %s \n", esto->tipo);
-		esto = esto->siguiente;
-	}
-	return;
-}
-
-// interface que agrega [ ... ] y el \n
-void imprimir_pila(elem* lista) {
-	printf("----> ");
-	imprime_elemento(lista);
-	printf("\n");
-	return;
-}
-
-// agregar un elemento en la posicion que
-// le corresponde (valores de menor a mayor)
-elem* push(char *valor, char *tipo, elem* aqui) {
-	elem* nuevo = NULL; // auxiliar
-	// para crear el nuevo elemento
-
-	if (aqui != NULL) {
-		//imprimir_pila(aqui);
-	}
-	else {
-		printf("No hay nada.\n");
-	}
-
-	if (aqui == NULL) { // no hay nadie
-		nuevo = (elem*)malloc(sizeof(elem));
-		strcpy(nuevo->dato, valor); // asignar dato
-		strcpy(nuevo->tipo, tipo);
-		nuevo->siguiente = NULL; // el unico
-		nuevo->anterior = NULL; // el unico
-		return nuevo;
-	}
-	else {
-		nuevo = (elem*)malloc(sizeof(elem));
-		strcpy(nuevo->dato, valor); // asignar dato
-		strcpy(nuevo->tipo, tipo);
-		nuevo->siguiente = aqui;
-		aqui->anterior = nuevo;
-		nuevo->anterior = NULL;
-	}
-	return nuevo;
-}
 
 
 

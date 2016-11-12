@@ -529,6 +529,7 @@ char *yytext;
 #line 2 "./lexico.l"
 	#define YYSTYPE t_simbolo *
     #include "lexico.h"
+	
 
     FILE *f;
     //**Lista que contiene la tabla de simbolos**//
@@ -538,7 +539,7 @@ char *yytext;
     int declarando=0;
     int linea = 1;
 
-#line 542 "lex.yy.c"
+#line 543 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -720,9 +721,9 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 72 "./lexico.l"
+#line 73 "./lexico.l"
 
-#line 726 "lex.yy.c"
+#line 727 "lex.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -808,208 +809,208 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 73 "./lexico.l"
+#line 74 "./lexico.l"
 {int i; for(i=0; i<strlen(yytext); i++)   {if(yytext[i]=='\n')    linea++;}}
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 74 "./lexico.l"
+#line 75 "./lexico.l"
 {linea++;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 75 "./lexico.l"
+#line 76 "./lexico.l"
 {}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 77 "./lexico.l"
+#line 78 "./lexico.l"
 {  declarando=1; return DECVAR;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 78 "./lexico.l"
+#line 79 "./lexico.l"
 {  declarando=0; return ENDDEC;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 79 "./lexico.l"
+#line 80 "./lexico.l"
 {  return REPEAT;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 80 "./lexico.l"
+#line 81 "./lexico.l"
 {  return UNTIL;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 81 "./lexico.l"
+#line 82 "./lexico.l"
 { return IF;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 82 "./lexico.l"
+#line 83 "./lexico.l"
 {  return ENDIF;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 83 "./lexico.l"
+#line 84 "./lexico.l"
 {  return ELSE;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 84 "./lexico.l"
+#line 85 "./lexico.l"
 {  return AND;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 85 "./lexico.l"
+#line 86 "./lexico.l"
 {  return OR;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 86 "./lexico.l"
+#line 87 "./lexico.l"
 { return NOT;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 87 "./lexico.l"
+#line 88 "./lexico.l"
 {  return ALIAS;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 88 "./lexico.l"
+#line 89 "./lexico.l"
 {  return BETWEEN;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 89 "./lexico.l"
+#line 90 "./lexico.l"
 { return WRITE;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 90 "./lexico.l"
+#line 91 "./lexico.l"
 { return READ;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 91 "./lexico.l"
+#line 92 "./lexico.l"
 { return INTEGER;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 92 "./lexico.l"
+#line 93 "./lexico.l"
 { return FLOAT;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 93 "./lexico.l"
+#line 94 "./lexico.l"
 { return STRING;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 95 "./lexico.l"
+#line 96 "./lexico.l"
 { return OP_ASIG;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 96 "./lexico.l"
+#line 97 "./lexico.l"
 {  return OP_CONCAT;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 97 "./lexico.l"
+#line 98 "./lexico.l"
 {  return OP_SUMA;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 98 "./lexico.l"
+#line 99 "./lexico.l"
 {  return OP_RESTA;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 99 "./lexico.l"
+#line 100 "./lexico.l"
 {  return OP_POR;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 100 "./lexico.l"
+#line 101 "./lexico.l"
 { return OP_DIV;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 101 "./lexico.l"
+#line 102 "./lexico.l"
 { return OP_MENIG;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 102 "./lexico.l"
+#line 103 "./lexico.l"
 {  return OP_MEN;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 103 "./lexico.l"
+#line 104 "./lexico.l"
 { return OP_MAYIG;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 104 "./lexico.l"
+#line 105 "./lexico.l"
 {  return OP_MAY;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 105 "./lexico.l"
+#line 106 "./lexico.l"
 { return OP_IG;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 106 "./lexico.l"
+#line 107 "./lexico.l"
 { return OP_NOIG;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 107 "./lexico.l"
+#line 108 "./lexico.l"
 { return PAR_AB;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 108 "./lexico.l"
+#line 109 "./lexico.l"
 { return PAR_CERR;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 109 "./lexico.l"
+#line 110 "./lexico.l"
 {  return CORC_AB;}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 110 "./lexico.l"
+#line 111 "./lexico.l"
 {  return CORC_CERR;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 111 "./lexico.l"
+#line 112 "./lexico.l"
 {  return COMA;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 112 "./lexico.l"
+#line 113 "./lexico.l"
 {  return PYCOMA;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 113 "./lexico.l"
+#line 114 "./lexico.l"
 {  return DOSPUNTOS;}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 114 "./lexico.l"
+#line 115 "./lexico.l"
 {return PORCIENTO;}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 116 "./lexico.l"
+#line 117 "./lexico.l"
 {
 	validar(0);
 	if (declarando == 1){
@@ -1029,7 +1030,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 132 "./lexico.l"
+#line 133 "./lexico.l"
 {
 	validar(1);
 	agregarSimbolo(yytext,1);
@@ -1041,7 +1042,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 140 "./lexico.l"
+#line 141 "./lexico.l"
 {
 	validar(2);
 	agregarSimbolo(yytext,2);
@@ -1054,7 +1055,7 @@ YY_RULE_SETUP
 case 44:
 /* rule 44 can match eol */
 YY_RULE_SETUP
-#line 148 "./lexico.l"
+#line 149 "./lexico.l"
 {
 	validar(3);
 	yytext[strlen(yytext)-1] = '\0';
@@ -1068,15 +1069,15 @@ YY_RULE_SETUP
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 159 "./lexico.l"
+#line 160 "./lexico.l"
 { printf("Error lexico en %s \n", yytext); exit(-1); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 161 "./lexico.l"
+#line 162 "./lexico.l"
 ECHO;
 	YY_BREAK
-#line 1080 "lex.yy.c"
+#line 1081 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2073,7 +2074,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 161 "./lexico.l"
+#line 162 "./lexico.l"
 
 
 
@@ -2312,89 +2313,6 @@ void tsEscribirBinario(){
 	fclose(ptrTsBin);
 }
 
-// eliminar todos los elementos de la lista
-// opcion vaciar
-elem* borrar_pila(elem* esto) {
-	elem* temp; // auxiliar 
-	// iterativa
-	while (esto != NULL) {
-		temp = esto->siguiente;
-		free(esto); // liberar
-		esto = temp; // avanza al siguinte
-	}
-	return NULL; // que ya no hay lista
-}
-
-// devuelve si o no se pudo eliminar
-// (no se puede eliminar si no esta)
-// valor cuyo elemento hay que eliminar
-// (unicamente elimina el primer elemento
-// cuyo valor coincide)
-// elemento en el cual estamos buscando = aqui
-int eliminar_elemento_pila(elem* aqui,
-	elem** inicio) {
-	if (aqui != NULL) { // si hay algo
-		*inicio = aqui->siguiente;
-		free(aqui); // borrame      return TRUE; // eliminacion exitosa
-		return 1;
-	}
-	return -1;
-}
-
-// interface para llamadas mas bonitas
-int pop(elem** inicio) {
-	return eliminar_elemento_pila(*inicio, inicio);
-}
-
-void imprime_elemento(elem* esto) {
-	// iterativa
-	while (esto != NULL) {
-		printf("%s - ", esto->dato);
-		//printf("tipo: %s \n", esto->tipo);
-		esto = esto->siguiente;
-	}
-	return;
-}
-
-// interface que agrega [ ... ] y el \n
-void imprimir_pila(elem* lista) {
-	printf("----> ");
-	imprime_elemento(lista);
-	printf("\n");
-	return;
-}
-
-// agregar un elemento en la posicion que
-// le corresponde (valores de menor a mayor)
-elem* push(char *valor, char *tipo, elem* aqui) {
-	elem* nuevo = NULL; // auxiliar
-	// para crear el nuevo elemento
-
-	if (aqui != NULL) {
-		//imprimir_pila(aqui);
-	}
-	else {
-		printf("No hay nada.\n");
-	}
-
-	if (aqui == NULL) { // no hay nadie
-		nuevo = (elem*)malloc(sizeof(elem));
-		strcpy(nuevo->dato, valor); // asignar dato
-		strcpy(nuevo->tipo, tipo);
-		nuevo->siguiente = NULL; // el unico
-		nuevo->anterior = NULL; // el unico
-		return nuevo;
-	}
-	else {
-		nuevo = (elem*)malloc(sizeof(elem));
-		strcpy(nuevo->dato, valor); // asignar dato
-		strcpy(nuevo->tipo, tipo);
-		nuevo->siguiente = aqui;
-		aqui->anterior = nuevo;
-		nuevo->anterior = NULL;
-	}
-	return nuevo;
-}
 
 
 
