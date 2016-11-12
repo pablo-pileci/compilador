@@ -1,0 +1,1 @@
+_Ingrese parte 1 ||WRITE||variableString||READ||_Ingrese parte 2 ||WRITE||inputString||READ||variableString||inputString||++||concatenada||:=||_La union es ||concatenada||++||mensaje||:=||concatenada||WRITE||mensaje||WRITE||

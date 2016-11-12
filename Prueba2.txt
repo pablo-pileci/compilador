@@ -1,8 +1,13 @@
 DECVAR
-	a,a2: Integer
+	variableInt: Integer
+	variableString, inputString, concatenada, mensaje: String
 ENDDEC
 
-IF (a*7+b < b+c*4)
-	a:= a+1
-ENDIF
-c:=15
+WRITE "Ingrese parte 1 "
+READ variableString
+WRITE "Ingrese parte 2 "
+READ inputString
+concatenada := variableString ++ inputString
+mensaje := "La union es " ++ concatenada 
+WRITE concatenada
+WRITE mensaje

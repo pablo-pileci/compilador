@@ -1,5 +1,0 @@
-Compilen asi y en este orden:
-
-bison -dyv ./sintactico.y
-flex ./lexico.l
-g++ y.tab.c lex.yy.c -o compilador -lfl

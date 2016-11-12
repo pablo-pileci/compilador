@@ -1,8 +1,10 @@
 Nombre                           Alias          Tipo           Valor                          Longitud
 ----------------------------------------------------------------------------------------------------------
-a                                                                                             0    
-a2                                                                                            0    
-_7                                                             7                              0    
-_4                                                             4                              0    
-_1                                                             1                              0    
-_15                                                            15                             0    
+variableInt                                     Integer                                       0    
+variableString                                  String                                        0    
+inputString                                     String                                        0    
+concatenada                                     String                                        0    
+mensaje                                         String                                        0    
+_Ingrese parte 1                                CteString      Ingrese parte 1                16   
+_Ingrese parte 2                                CteString      Ingrese parte 2                16   
+_La union es                                    CteString      La union es                    12   

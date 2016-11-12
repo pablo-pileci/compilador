@@ -74,51 +74,50 @@ COMENTARIO  {COMENT_AB}([^\/]|(\/[^-]))*{COMENT_CERR}
 {LINEA}       {linea++;}
 {BLANCOS}     {}
 
-{DECVAR}        { agregar_nop_lista_tokens("PR"); declarando=1; return DECVAR;}
-{ENDDEC}        { agregar_nop_lista_tokens("PR"); declarando=0; return ENDDEC;}
-{REPEAT}       	{ agregar_nop_lista_tokens("PR"); return REPEAT;}
-{UNTIL}    	    { agregar_nop_lista_tokens("PR"); return UNTIL;}
-{IF}          	{ agregar_nop_lista_tokens("PR"); return IF;}
-{ENDIF}       	{ agregar_nop_lista_tokens("PR"); return ENDIF;}
-{ELSE}			{ agregar_nop_lista_tokens("PR"); return ELSE;}
-{AND}         	{ agregar_nop_lista_tokens("PR"); return AND;}
-{OR}          	{ agregar_nop_lista_tokens("PR"); return OR;}
-{NOT}         	{ agregar_nop_lista_tokens("PR"); return NOT;}
-{ALIAS}    	    { agregar_nop_lista_tokens("PR"); return ALIAS;}
-{BETWEEN}	    { agregar_nop_lista_tokens("PR"); return BETWEEN;}
-{WRITE}       	{ agregar_nop_lista_tokens("PR"); return WRITE;}
-{READ}        	{ agregar_nop_lista_tokens("PR"); return READ;}
-{INTEGER}     	{ agregar_nop_lista_tokens("PR"); return INTEGER;}
-{FLOAT}       	{ agregar_nop_lista_tokens("PR"); return FLOAT;}
-{STRING}      	{ agregar_nop_lista_tokens("PR"); return STRING;}
+{DECVAR}        {  declarando=1; return DECVAR;}
+{ENDDEC}        {  declarando=0; return ENDDEC;}
+{REPEAT}       	{  return REPEAT;}
+{UNTIL}    	    {  return UNTIL;}
+{IF}          	{ return IF;}
+{ENDIF}       	{  return ENDIF;}
+{ELSE}			{  return ELSE;}
+{AND}         	{  return AND;}
+{OR}          	{  return OR;}
+{NOT}         	{ return NOT;}
+{ALIAS}    	    {  return ALIAS;}
+{BETWEEN}	    {  return BETWEEN;}
+{WRITE}       	{ return WRITE;}
+{READ}        	{ return READ;}
+{INTEGER}     	{ return INTEGER;}
+{FLOAT}       	{ return FLOAT;}
+{STRING}      	{ return STRING;}
 
-{OP_ASIG}     { agregar_op_lista_tokens("OP_ASIG"); return OP_ASIG;}
-{OP_CONCAT}   { agregar_op_lista_tokens("OP_CONCAT"); return OP_CONCAT;}
-{OP_SUMA}     { agregar_op_lista_tokens("OP_SUMA"); return OP_SUMA;}
-{OP_RESTA}    { agregar_op_lista_tokens("OP_RESTA"); return OP_RESTA;}
-{OP_POR}      { agregar_op_lista_tokens("OP_POR"); return OP_POR;}
-{OP_DIV}      { agregar_op_lista_tokens("OP_DIV"); return OP_DIV;}
-{OP_MENIG}    { agregar_op_lista_tokens("OP_MENIG"); return OP_MENIG;}
-{OP_MEN}      { agregar_op_lista_tokens("OP_MEN"); return OP_MEN;}
-{OP_MAYIG}    { agregar_op_lista_tokens("OP_MAYIG"); return OP_MAYIG;}
-{OP_MAY}      { agregar_op_lista_tokens("OP_MAY"); return OP_MAY;}
-{OP_IG}       { agregar_op_lista_tokens("OP_IG"); return OP_IG;}
-{OP_NOIG}     { agregar_op_lista_tokens("OP_NOIG"); return OP_NOIG;}
-{PAR_AB}      { agregar_op_lista_tokens("PAR_AB"); return PAR_AB;}
-{PAR_CERR}    { agregar_op_lista_tokens("PAR_CERR"); return PAR_CERR;}
-{CORC_AB}     { agregar_op_lista_tokens("CORC_AB"); return CORC_AB;}
-{CORC_CERR}   { agregar_op_lista_tokens("CORC_CERR"); return CORC_CERR;}
-{COMA}        { agregar_op_lista_tokens("COMA"); return COMA;}
-{PYCOMA}      { agregar_op_lista_tokens("PYCOMA"); return PYCOMA;}
-{DOSPUNTOS}   { agregar_op_lista_tokens("DOSPUNTOS"); return DOSPUNTOS;}
-{PORCIENTO}    { agregar_op_lista_tokens("PORCIENTO"); return PORCIENTO;}
+{OP_ASIG}     { return OP_ASIG;}
+{OP_CONCAT}   {  return OP_CONCAT;}
+{OP_SUMA}     {  return OP_SUMA;}
+{OP_RESTA}    {  return OP_RESTA;}
+{OP_POR}      {  return OP_POR;}
+{OP_DIV}      { return OP_DIV;}
+{OP_MENIG}    { return OP_MENIG;}
+{OP_MEN}      {  return OP_MEN;}
+{OP_MAYIG}    { return OP_MAYIG;}
+{OP_MAY}      {  return OP_MAY;}
+{OP_IG}       { return OP_IG;}
+{OP_NOIG}     { return OP_NOIG;}
+{PAR_AB}      { return PAR_AB;}
+{PAR_CERR}    { return PAR_CERR;}
+{CORC_AB}     {  return CORC_AB;}
+{CORC_CERR}   {  return CORC_CERR;}
+{COMA}        {  return COMA;}
+{PYCOMA}      {  return PYCOMA;}
+{DOSPUNTOS}   {  return DOSPUNTOS;}
+{PORCIENTO}    {return PORCIENTO;}
 
 {ID} {
 	validar(0);
 	if (declarando == 1){
 		agregarSimbolo(yytext,0);
 	}
-	agregar_nop_lista_tokens("ID");
 	yylval = buscarSimbolo(yytext);
 	if (yylval == NULL){
 		yylval = ( t_simbolo* )malloc( sizeof(t_simbolo) );
@@ -133,7 +132,6 @@ COMENTARIO  {COMENT_AB}([^\/]|(\/[^-]))*{COMENT_CERR}
 {CTE_INT}     {
 	validar(1);
 	agregarSimbolo(yytext,1);
-	agregar_nop_lista_tokens("CTE_INT");
 	strcpy(constantes,"_");
 	strcat(constantes,yytext);
 	yylval = buscarSimbolo(constantes);
@@ -142,7 +140,6 @@ COMENTARIO  {COMENT_AB}([^\/]|(\/[^-]))*{COMENT_CERR}
 {CTE_REAL}    {
 	validar(2);
 	agregarSimbolo(yytext,2);
-	agregar_nop_lista_tokens("CTE_REAL");
 	strcpy(constantes,"_");
 	strcat(constantes,yytext);
 	yylval = buscarSimbolo(constantes);
@@ -153,7 +150,6 @@ COMENTARIO  {COMENT_AB}([^\/]|(\/[^-]))*{COMENT_CERR}
 	yytext[strlen(yytext)-1] = '\0';
     yytext++;
 	agregarSimbolo(yytext,3);
-	agregar_nop_lista_tokens("CTE_STR");
 	strcpy(constantes,"_");
 	strcat(constantes,yytext);
 	yylval = buscarSimbolo(constantes);
@@ -218,17 +214,6 @@ void validar(int tipo)
     }
 }
 
-void agregar_nop_lista_tokens(const char *token)
-{
-  //sprintf(stringtoken, "%s<%s:%s>",stringtoken, token, yytext);
-}
-
-
-void agregar_op_lista_tokens(const char *token)
-{
-    //sprintf(stringtoken, "%s<%s>",stringtoken, token);
-}
-
 /////FUNCINES PARA TS
 
 /* Descrip: Funcion para agregar elementos a la tabla de simbolos
@@ -240,9 +225,14 @@ int agregarSimbolo(const char* nombre, int tipo){
     char aux[32];
     strcpy(aux,"_");
     strcat(aux,nombre);
-	pos = buscarEnTS(aux);
+	if (tipo != 0){
+		pos = buscarEnTS(aux);
+	}
+	else{
+		pos = buscarEnTS(nombre);
+	}
+	
 	// Si el elemento no se encuentra en la lista, lo cargamos haciendo uso de la variable info
-
 	if ( pos == -1 ){
 		info = ( t_simbolo* )malloc( sizeof(t_simbolo) );
 		if ( !info ){
@@ -274,6 +264,10 @@ int agregarSimbolo(const char* nombre, int tipo){
 		listSimbolos.push_back( *info );
 		pos = listSimbolos.size();
 		free(info);
+	}
+	else if (tipo == 0){
+		printf("Identificador %s ya declarado, linea %d\n", nombre,linea);
+	    exit(-1);
 	}
 
 	return pos;
@@ -328,7 +322,14 @@ t_simbolo* buscarSimbolo(const char* nombre){
 		}
 		// Si no se encontro el elemento
 		if ( it != listSimbolos.end()){
-			pSimbolo = &(*it);
+			if (strcmp((*it).alias,nombre) == 0){
+				(*it).busquedaAlias = 1;
+			}
+			else{
+				(*it).busquedaAlias = 0;
+			}
+			
+			pSimbolo = &(*it);	
 		}
     }
     return pSimbolo;
@@ -393,3 +394,91 @@ void tsEscribirBinario(){
 	}
 	fclose(ptrTsBin);
 }
+
+// eliminar todos los elementos de la lista
+// opcion vaciar
+elem* borrar_pila(elem* esto) {
+	elem* temp; // auxiliar 
+	// iterativa
+	while (esto != NULL) {
+		temp = esto->siguiente;
+		free(esto); // liberar
+		esto = temp; // avanza al siguinte
+	}
+	return NULL; // que ya no hay lista
+}
+
+// devuelve si o no se pudo eliminar
+// (no se puede eliminar si no esta)
+// valor cuyo elemento hay que eliminar
+// (unicamente elimina el primer elemento
+// cuyo valor coincide)
+// elemento en el cual estamos buscando = aqui
+int eliminar_elemento_pila(elem* aqui,
+	elem** inicio) {
+	if (aqui != NULL) { // si hay algo
+		*inicio = aqui->siguiente;
+		free(aqui); // borrame      return TRUE; // eliminacion exitosa
+		return 1;
+	}
+	return -1;
+}
+
+// interface para llamadas mas bonitas
+int pop(elem** inicio) {
+	return eliminar_elemento_pila(*inicio, inicio);
+}
+
+void imprime_elemento(elem* esto) {
+	// iterativa
+	while (esto != NULL) {
+		printf("%s - ", esto->dato);
+		//printf("tipo: %s \n", esto->tipo);
+		esto = esto->siguiente;
+	}
+	return;
+}
+
+// interface que agrega [ ... ] y el \n
+void imprimir_pila(elem* lista) {
+	printf("----> ");
+	imprime_elemento(lista);
+	printf("\n");
+	return;
+}
+
+// agregar un elemento en la posicion que
+// le corresponde (valores de menor a mayor)
+elem* push(char *valor, char *tipo, elem* aqui) {
+	elem* nuevo = NULL; // auxiliar
+	// para crear el nuevo elemento
+
+	if (aqui != NULL) {
+		//imprimir_pila(aqui);
+	}
+	else {
+		printf("No hay nada.\n");
+	}
+
+	if (aqui == NULL) { // no hay nadie
+		nuevo = (elem*)malloc(sizeof(elem));
+		strcpy(nuevo->dato, valor); // asignar dato
+		strcpy(nuevo->tipo, tipo);
+		nuevo->siguiente = NULL; // el unico
+		nuevo->anterior = NULL; // el unico
+		return nuevo;
+	}
+	else {
+		nuevo = (elem*)malloc(sizeof(elem));
+		strcpy(nuevo->dato, valor); // asignar dato
+		strcpy(nuevo->tipo, tipo);
+		nuevo->siguiente = aqui;
+		aqui->anterior = nuevo;
+		nuevo->anterior = NULL;
+	}
+	return nuevo;
+}
+
+
+
+

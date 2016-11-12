@@ -6,9 +6,10 @@
 #define TIPO_STRING 2
 #define ERROR_TIPO 3
 
+
 int ts_Operacion[3][3];
 
-int verificarTipo(char, int, int);
+int verificarTipo(char, int, int,int);
 
 
 void cargarTablaSintesis()
@@ -25,25 +26,23 @@ void cargarTablaSintesis()
 
 }
 
-
 //Verifica tipos de operaciones de *, - y /
-int verificarTipo(char oper, int indLeft, int indRight)
+int verificarTipo(char oper, int indLeft, int indRight, int numeroLinea)
 {
  	 switch(ts_Operacion[indLeft][indRight])
-	 { 
+	 {
 	    case ERROR_TIPO:
-			 printf("\n\t ERROR: de incompatibilidad de tipos\n");
+			 printf("\n\t ERROR: de incompatibilidad de tipos. Linea: %d\n",numeroLinea);
 			 system("PAUSE");
 			 exit(1);
 			 break;
 	    default :
-			 if (oper == '+' || oper == 'A')
-          {
-                return ts_Operacion[indLeft][indRight];
-             }
+			 if (oper == '+' || oper == 'A' || oper=='C')
+                {
+                    return ts_Operacion[indLeft][indRight];
+                }
 
              else
-
              if (indLeft == TIPO_STRING || indRight == TIPO_STRING) {
                 printf("\n\t ERROR: operacion no valida\n");
 

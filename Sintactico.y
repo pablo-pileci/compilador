@@ -2,25 +2,25 @@
 %{
 	#define YYSTYPE t_simbolo *
 	#include "lexico.h"
+	#include "ttipos.h"
 	FILE *reglas=NULL;
 	FILE *intermedia=NULL;
 	char error[1000];
 	#define CANTVAR 200
-
-    #include "ttipos.h"
-	#include <vector>
 
     #define TIPO_ENTERO 0
     #define TIPO_REAL 1
     #define TIPO_STRING 2
     #define ERROR_TIPO 3
 
-    typedef struct  {
-    	int pos;
-    	char * cad;
-    } tElementoPolaca;
+	typedef struct  {
+	        int pos;
+	        char * cad;
+	} tElementoPolaca;
+
 	std::vector<tElementoPolaca> tiraPolaca;
-	int posActualPolaca = -1,x,inAnd=0,inOr=0;
+
+	int posActualPolaca = -1,x,inAnd=0,inOr=0,isNot = 0;
 	char auxPolaca[10],auxComparador[5];
 	struct tpila * pilaPolaca;
 	struct tdato dato;
@@ -108,75 +108,61 @@
 programa: declaracion cuerpo
 		{
 
-			printf("0  - (START) PROGRAMA: DECLARACION CUERPO\n\n***** COMPILACION EXITOSA *****\n");
 			fprintf(reglas, "0 ");
 			escribirTS();
 			escribirPolaca();
 			
 		} |
 		cuerpo {
-			printf("1  - (START) PROGRAMA: CUERPO\n\n***** COMPILACION EXITOSA *****\n");
 			fprintf(reglas, "1 ");
 			escribirTS();
 			escribirPolaca();
 		}  |
 		declaracion {
-			printf("2  - (START) PROGRAMA: DECLARACION\n\n***** COMPILACION EXITOSA *****\n");
 			fprintf(reglas, "2 ");
 			escribirTS();
-
 		};
 
 cuerpo: sentencia {
-			printf("3  - CUERPO: SENTENCIA\n");
 			fprintf(reglas, "3 ");
 		}
 
 	| cuerpo sentencia
 		{
-			printf("4  - CUERPO: CUERPO SENTENCIA\n");
 			fprintf(reglas, "4 ");
 		};
 
 sentencia: asignacion
 		{
-			printf("5  - SENTENCIA: ASIGNACION\n");
 			fprintf(reglas, "5 ");
 		}
 	| iteracion
 		{
-			printf("6  - SENTENCIA: ITERACION\n");
 			fprintf(reglas, "6 ");
 		}
 	| decision
 		{
-			printf("7  - SENTENCIA: DECISION\n");
 			fprintf(reglas, "7 ");
 		}
 	| io
 		{
-			printf("8  - SENTENCIA: IO\n");
 			fprintf(reglas, "8 ");
 		}
 	|funcion
 		{
-			printf("9  - SENTENCIA: FUNCION\n");
 			fprintf(reglas, "9 ");
 		};
 
 declaracion: DECVAR  dec ENDDEC
 		{
-			printf("10  - DECVAR  dec\n");
 			fprintf(reglas, "10 ");
 		} | DECVAR ENDDEC
 		{
-			printf("11  - DECVAR  dec\n");
 			fprintf(reglas, "11 ");
 		};
 
 dec : lineadeclara
         {
-        	printf("12  - lineadeclara ENDDEC  dec\n");
         	fprintf(reglas, "12 ");
             int i=0;
 			while(i_variables > i){
@@ -187,7 +173,6 @@ dec : lineadeclara
         }
         |dec lineadeclara
             {
-            	printf("13  - dec lineadeclara ENNDEC  dec\n");
             	fprintf(reglas, "13 ");
                 int i=0;
                 while(i_variables > i){
@@ -200,121 +185,141 @@ dec : lineadeclara
 
 lineadeclara: listavar DOSPUNTOS tipo
 		{
-			printf("14  - lineadeclara: listavar DOSPUNTOS tipo\n");
 			fprintf(reglas, "14 ");
 		};
 
 
 tipo: INTEGER
 		{
-			printf("15 - TIPO: INTEGER\n");
 			fprintf(reglas, "15 ");
 			strcpy(tipoId,"Integer");
 		}
 	| FLOAT
 		{
-			printf("16 - TIPO: FLOAT\n");
 			fprintf(reglas, "16 ");
 			strcpy(tipoId,"Float");
 		}
 	| STRING
 		{
-			printf("17 - TIPO: STRING\n");
 			fprintf(reglas, "17 ");
 			strcpy(tipoId,"String");
 		};
 
 listavar: vars
 		{
-			printf("18 - LISTAVAR: VARS\n");
 			fprintf(reglas, "18 ");
 		};
 
 vars: id
 		{
-			printf("19 - VARS: ID\n");
 			fprintf(reglas, "19 ");
 		}
 	| vars COMA id
 		{
-			printf("20 - VARS: VARS COMA ID\n");
 			fprintf(reglas, "20	");
 		}  ;
 
 asignacion: id OP_ASIG exp
 		{
-			printf("21 - ASIGNACION: ID OP_ASIG EXP\n");
 			fprintf(reglas, "21 ");
 			insertar_en_polaca($1->nombre);
 			strcpy(auxPolaca,":=");
 			insertar_en_polaca(auxPolaca);
-			//printf("*************ASIG  %d %d\n",tipoDat,expTipo);
-            verificarTipo('A', tipoDat, expTipo);
+			verificarTipo('A', getTipo($1->tipo), expTipo,linea);
 		};
 
 exp: termino
 		{
-			printf("22 - EXP: TERMINO\n");
 			fprintf(reglas, "22 ");
 			expTipo=termTipo;
         }
 	| exp OP_SUMA termino
 		{
-			printf("23 - EXP: EXP OP_SUMA TERMINO\n");
 			fprintf(reglas, "23 ");
 			strcpy(auxPolaca,"+");
 			insertar_en_polaca(auxPolaca);
-			expTipo=verificarTipo('+', expTipo, termTipo);
+			if (expTipo == TIPO_STRING || termTipo == TIPO_STRING){
+				sprintf(error,"Operación no válida para strings");
+				yyerror(error);
+			}
+			expTipo=verificarTipo('+', expTipo, termTipo,linea);
 
 		}
 	| exp OP_RESTA termino
 		{
-			printf("24 - EXP: ESP OP_RESTA TERMINO\n");
 			fprintf(reglas, "24 ");
 			strcpy(auxPolaca,"-");
 			insertar_en_polaca(auxPolaca);
-			expTipo=verificarTipo('-', expTipo, termTipo);
+			if (expTipo == TIPO_STRING || termTipo == TIPO_STRING){
+				sprintf(error,"Operación no válida para strings");
+				yyerror(error);
+			}
+			expTipo=verificarTipo('-', expTipo, termTipo,linea);
 		}
-	| factor OP_CONCAT factor {
-			printf("25 - EXP: FACT OP_CONCAT FACTOR\n");
+	| factor_str OP_CONCAT id {
 			fprintf(reglas, "25 ");
+			insertar_en_polaca($3->nombre);
 			strcpy(auxPolaca,"++");
 			insertar_en_polaca(auxPolaca);
-		} ;
+			expTipo=verificarTipo('C', facTipo, getTipo($3->tipo),linea);
+		}
+    | factor_str OP_CONCAT cte_str {
+			fprintf(reglas, "25b ");
+			strcpy(auxPolaca,"++");
+			insertar_en_polaca(auxPolaca);
+			expTipo=verificarTipo('C', facTipo, TIPO_STRING,linea);
+		};
 
+factor_str:
+        id
+		{
+			fprintf(reglas, "30b ");
+			insertar_en_polaca($1->nombre);
+			facTipo=tipoDat;
+
+		}
+		| cte_str
+		{
+			fprintf(reglas, "33b ");
+			insertar_en_polaca($1->nombre);
+            facTipo=TIPO_STRING;
+		};
 
 termino: factor
 		{
-			printf("26 - TERMINO: FACTOR\n");
 			fprintf(reglas, "26 ");
 			termTipo=facTipo;
 		}
 	| termino OP_POR factor
 		{
-			printf("27 - TERMINO: TERMINO OP_POR FACTOR\n");
 			fprintf(reglas, "27 ");
 			strcpy(auxPolaca,"*");
 			insertar_en_polaca(auxPolaca);
-			termTipo=verificarTipo('*', termTipo, facTipo);
+			if (termTipo == TIPO_STRING || facTipo == TIPO_STRING){
+				sprintf(error,"Operación no válida para strings");
+				yyerror(error);
+			}
+			termTipo=verificarTipo('*', termTipo, facTipo,linea);
 		}
 	| termino OP_DIV factor
 		{
-			printf("28 - TERMINO: TERMINO OP_DIV FACTOR\n");
 			fprintf(reglas, "28 ");
 			strcpy(auxPolaca,"/");
 			insertar_en_polaca(auxPolaca);
-            termTipo=verificarTipo('/', termTipo, facTipo);
+			if (termTipo == TIPO_STRING || facTipo == TIPO_STRING){
+				sprintf(error,"Operación no válida para strings");
+				yyerror(error);
+			}
+            termTipo=verificarTipo('/', termTipo, facTipo,linea);
 		}  ;
 
 factor: PAR_AB exp PAR_CERR
 		{
-			printf("29 - FACTOR: PAR_AB EXP PAR_CERR\n");
 			fprintf(reglas, "29 ");
 
 		}
 	| id
 		{
-			printf("30 - FACTOR: ID\n");
 			fprintf(reglas, "30 ");
 			insertar_en_polaca($1->nombre);
 			facTipo=tipoDat;
@@ -322,21 +327,18 @@ factor: PAR_AB exp PAR_CERR
 		}
 	| cte_int
 		{
-			printf("31 - FACTOR: CTE_INT\n");
 			fprintf(reglas, "31 ");
 			insertar_en_polaca($1->nombre);
 			facTipo=TIPO_ENTERO;
 		}
 	| cte_real
 		{
-			printf("32 - FACTOR: CTE_REAL\n");
 			fprintf(reglas, "32 ");
 			insertar_en_polaca($1->nombre);
 			facTipo=TIPO_REAL;
 		}
 	| cte_str
 		{
-			printf("33 - FACTOR: CTE_STR\n");
 			fprintf(reglas, "33 ");
 			insertar_en_polaca($1->nombre);
             facTipo=TIPO_STRING;
@@ -370,45 +372,43 @@ id: ID
 				strcpy(dec_variables[i_variables++], yytext);
 			}
 			else{
-
-            if (buscarEnTS($1->nombre) == -1){
-                    sprintf(error,"Identificador \"%s\" no declarado",$1->nombre);
-                    yyerror(error);
-			}
-
+				if (buscarEnTS($1->nombre) == -1){
+	                    sprintf(error,"Identificador \"%s\" no declarado",$1->nombre);
+	                    yyerror(error);
 				}
-				expTipo=tipoDat;
-				tipoDat= getTipo(($1)->tipo);
-				//printf("*************id tipo %d\n", tipoDat);
+				
+			}
+			expTipo=tipoDat;
+			tipoDat= getTipo(($1)->tipo);
+
 		};
 
 funcion: falias
 		{
-			printf("34 - FUNCION: ALIAS\n");
 			fprintf(reglas, "34 ");
-		}
-		| fbetween
-		{
-             printf("35 - FUNCION: BETWEEN\n");
-             fprintf(reglas, "35 ");
 		};
 
 
 
-falias: ALIAS ID PORCIENTO ID
-		{
-			printf("36 - FALIAS: ALIAS ID PORCIENTO ID\n");
-			fprintf(reglas, "36 ");
-			if (buscarEnTS($2->nombre) != -1){
-				sprintf(error,"Identificador en alias \"%s\" ya declarado",$2->nombre);
-				yyerror(error);
+falias: ALIAS ID {
+
+	if ($2->alias != NULL && strcmp($2->alias," ") != 0 && $2->busquedaAlias == 1 ){
+					sprintf(error,"Alias \"%s\" ya definido",$2->alias);
+					yyerror(error);
 			}
 
-			if (buscarEnTS($4->nombre) == -1){
+			if (buscarEnTS($2->nombre) != -1 && $2->busquedaAlias == 0){
+					sprintf(error,"Identificador \"%s\" ya definido",$2->nombre);
+					yyerror(error);
+			}
+
+} PORCIENTO ID
+		{
+			if (buscarEnTS($5->nombre) == -1){
 				sprintf(error,"Identificador \"%s\" no declarado",yytext);
 				yyerror(error);
 			}
-			guardarAlias($4->nombre,$2->nombre);
+			guardarAlias($5->nombre,$2->nombre);
 		} ;
 
 fbetween: BETWEEN PAR_AB id {
@@ -424,7 +424,7 @@ fbetween: BETWEEN PAR_AB id {
 				insertar_en_polaca(auxPolaca);
 				strcpy(auxPolaca,"");
 				insertar_en_polaca(auxPolaca);
-				strcpy(auxComparador,"BLE");
+				strcpy(auxComparador,"JBE");
 				insertar_en_polaca(auxComparador);
 				insertar_en_polaca($3->nombre);
 
@@ -437,32 +437,25 @@ fbetween: BETWEEN PAR_AB id {
 				insertar_en_polaca(auxPolaca);
 				strcpy(auxPolaca,"");
 				insertar_en_polaca(auxPolaca);
-				strcpy(auxComparador,"BGE");
+				strcpy(auxComparador,"JAE");
 				insertar_en_polaca(auxComparador);
 	}
 
  CORC_CERR PAR_CERR
         {
-			printf("37 - FBETWEEN:BETWEEN PAR_AB ID COMA CORC_AB exp PYCOMA exp CORC_CERR PAR_CERR\n");
 			fprintf(reglas, "37 ");
 
 		}   ;
 
 condiciones: comp_Li
-		{
-			printf("38 - CONDICIONES: CONDICION\n");fprintf(reglas, "38 ");
-		}
 	| comp_Li AND {
 		inAnd=1;
 	}comp_Ld
-		{
-			printf("39 - CONDICIONES: CONDICION AND CONDICION\n");fprintf(reglas, "39 ");
-		}
 	| comp_Li OR {
 			inOr = 1;
 			strcpy(auxPolaca,"");
 			insertar_en_polaca(auxPolaca);
-			strcpy(auxPolaca,"BI");
+			strcpy(auxPolaca,"JMP");
 			insertar_en_polaca(auxPolaca);
 			dato = desapilar(pilaPolaca);
 			snprintf(tiraPolaca.at(dato.clave).cad, 10, "%d", posActualPolaca + 1);
@@ -471,20 +464,13 @@ condiciones: comp_Li
 			dato.inAnd = 0;
 			apilar(pilaPolaca,dato);
 	} comp_Ld
+	| NOT {isNot = 1;} comp_Li
 		{
+			verificarTipo('!', compLiTipo, compLiTipo,linea);
 
-			printf("40 - CONDICIONES: CONDICION OR CONDICION\n");fprintf(reglas, "40 ");
-		}
-	| NOT comp_Li
-		{
-			printf("41 - CONDICIONES: NOT CONDICION\n");fprintf(reglas, "41 ");
-			verificarTipo('!', compLiTipo, compLiTipo);
 		}
 	| fbetween
-		{
-			printf("42 - CONDICIONES: FBETWEEN\n");fprintf(reglas, "42 ");
-		}
-		;
+;
 
 
 comp_Li: condicion { compLiTipo=condTipo;
@@ -495,7 +481,6 @@ comp_Ld: condicion { compLdTipo=condTipo;
 
 		};
 condicion: cond_Li comparador cond_Ld {
-			printf("43 - CONDICION: EXP COMPARADOR EXP\n");fprintf(reglas, "43 ");
 			if (inAnd == 1){
 				dato.clave = posActualPolaca+2;
 				dato.inAnd = 1;
@@ -521,11 +506,12 @@ condicion: cond_Li comparador cond_Ld {
 			strcpy(auxPolaca,"");
 			insertar_en_polaca(auxPolaca);
 			insertar_en_polaca(auxComparador);
-			verificarTipo('C', condLiTipo, condLdTipo);
+			verificarTipo('C', condLiTipo, condLdTipo,linea);
 			condTipo=condLiTipo;
 			};
 
-cond_Li: exp { condLiTipo=expTipo;
+cond_Li: exp { 
+		condLiTipo=expTipo;
 		   }
        ;
 
@@ -534,12 +520,63 @@ cond_Ld: exp { condLdTipo=expTipo;
        ;
 
 
-comparador: OP_MAY 	{	strcpy(auxComparador,"BLE");  }
-	|	OP_MAYIG	{	strcpy(auxComparador,"BLT");  }
-	|	OP_IG 		{	strcpy(auxComparador,"BNE");  }
-	|	OP_NOIG 	{	strcpy(auxComparador,"BEQ");  }
-	|	OP_MENIG 	{	strcpy(auxComparador,"BGT");  }
-	|	OP_MEN 		{	strcpy(auxComparador,"BGE");  }	;
+comparador: OP_MAY 	{
+	if (isNot == 0){
+		strcpy(auxComparador,"JBE");
+	}
+	else{
+		strcpy(auxComparador,"JA");
+	}
+	isNot = 0;
+}
+	|	OP_MAYIG	{
+		if (isNot == 0){
+			strcpy(auxComparador,"JB");
+		}
+		else{
+			strcpy(auxComparador,"JAE");
+		}
+		isNot = 0;
+
+	}
+	|	OP_IG 		{
+		if (isNot == 0){
+			strcpy(auxComparador,"JNE");
+		}
+		else{
+			strcpy(auxComparador,"JE");
+		}
+		isNot = 0;
+
+	}
+	|	OP_NOIG 	{
+		if (isNot == 0){
+			strcpy(auxComparador,"JE");
+		}
+		else{
+			strcpy(auxComparador,"JNE");
+		}
+		isNot = 0;
+	}
+	|	OP_MENIG 	{
+		if (isNot == 0){
+			strcpy(auxComparador,"JA");
+		}
+		else{
+			strcpy(auxComparador,"JBE");
+		}
+		isNot = 0;
+
+	}
+	|	OP_MEN 		{
+		if (isNot == 0){
+			strcpy(auxComparador,"JAE");
+		}
+		else{
+			strcpy(auxComparador,"JB");
+		}
+		isNot = 0;
+	};
 
 
 iteracion: REPEAT
@@ -563,9 +600,9 @@ cuerpo UNTIL PAR_AB condiciones PAR_CERR
 			snprintf(auxPolaca, 10, "%d", dato.clave);
         	insertar_en_polaca(auxPolaca);
 
-			strcpy(auxPolaca,"BI");
+			strcpy(auxPolaca,"JMP");
 			insertar_en_polaca(auxPolaca);
-            printf("44 - ITERACION: REPEAT CUERPO UNTIL (CONDICIONES)\n");
+
 			fprintf(reglas, "44 ");
         };
 
@@ -582,12 +619,10 @@ decision: IF PAR_AB condiciones PAR_CERR cuerpo {
 
 } ENDIF
 		{
-			printf("45 - DECISION: IF ( CONDICIONES ) CUERPO ENDIF\n");
 			fprintf(reglas, "45 ");
 		}
 		|IF PAR_AB condiciones PAR_CERR cuerpo
 		{
-			printf("46 - DECISION: IF ( CONDICIONES ) CUERPO ELSE CUERPO ENDIF\n");
 			fprintf(reglas, "46 ");
 
 			dato = desapilar(pilaPolaca);
@@ -601,7 +636,7 @@ decision: IF PAR_AB condiciones PAR_CERR cuerpo {
 			apilar(pilaPolaca,dato);
 			strcpy(auxPolaca,"");
 			insertar_en_polaca(auxPolaca);
-			strcpy(auxPolaca,"BI");
+			strcpy(auxPolaca,"JMP");
 			insertar_en_polaca(auxPolaca);
 
 		}
@@ -613,23 +648,23 @@ decision: IF PAR_AB condiciones PAR_CERR cuerpo {
 
 io: READ id
 		{
-			printf("47 - IO: READ ID\n");
 			fprintf(reglas, "47 ");
 			insertar_en_polaca($2->nombre);
 			strcpy(auxPolaca,"READ");
 			insertar_en_polaca(auxPolaca);
-
+			if (getTipo($2->tipo) != TIPO_STRING){
+				sprintf(error,"Identificador \"%s\" en READ debe ser string",$2->nombre);
+	            yyerror(error);
+			}
 		}
 	| WRITE id
 		{
-			printf("48 - IO: WRITE ID\n");fprintf(reglas, "48 ");
 			insertar_en_polaca($2->nombre);
 			strcpy(auxPolaca,"WRITE");
 			insertar_en_polaca(auxPolaca);
 		}
 	| WRITE cte_str
 		{
-			printf("49 - IO: WRITE CTE_STR\n");
 			fprintf(reglas, "49 ");
 			insertar_en_polaca($2->nombre);
 			strcpy(auxPolaca,"WRITE");
@@ -693,7 +728,7 @@ void escribirPolaca() {
 	}
 	else {
 		for (std::vector<tElementoPolaca>::iterator it = tiraPolaca.begin() ; it != tiraPolaca.end(); ++it){
-			fprintf(intermedia, "%s ",it->cad);
+			fprintf(intermedia, "%s||",it->cad);
 		}
     	fclose(intermedia);
 	}
@@ -715,12 +750,14 @@ void escribirPolacaPorLinea() {
 }
 
 int getTipo(char*t)
-{//printf("******llega %s\n",t);
+{
+	int tipo = 3;
     if(strcmp(t,"Integer")==0)
-        return TIPO_ENTERO;
+        tipo = TIPO_ENTERO;
     if(strcmp(t,"Float")==0)
-        return TIPO_REAL;
+        tipo = TIPO_REAL;
     if(strcmp(t,"String")==0)
-        return TIPO_STRING;
+        tipo = TIPO_STRING;
+	return tipo;
 }
 

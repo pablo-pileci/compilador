@@ -1,6 +1,17 @@
 #ifndef g_lexico_h
 #define g_lexico_h
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <float.h>
+#include <errno.h>
+#include <list>
+#include <cctype>
+#include <stdbool.h>
+#include <vector>
+
 //estructura de simbolos de la tabla
 typedef struct{
     char *nombre;
@@ -8,6 +19,7 @@ typedef struct{
     char *valor;
     int longitud;
     char *alias;
+    int busquedaAlias;
 }t_simbolo;
 
 typedef struct{
@@ -19,15 +31,21 @@ typedef struct{
 }t_data;
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <float.h>
-#include <errno.h>
-#include <list>
-#include <string.h>
-#include <cctype>
+
+// estructura de un elemento de la lista
+struct elemento_de_lista {
+    char dato[1000]; // donde la info va
+    char tipo[50];
+    // doblemente enlazada
+    struct elemento_de_lista* siguiente; // puntero
+    struct elemento_de_lista* anterior; // puntero
+}; // <= ojo con el punto y coma
+
+// redefinición por brevedad
+typedef struct elemento_de_lista elem;
+
 #include "y.tab.h"
+
 
 using namespace std;
 
@@ -59,10 +77,15 @@ int yyerror(const char *);
 int agregarSimbolo(const char*, int);
 void guardarAlias(const char*, const char*);
 int buscarEnTS(const char*);
+int buscarAlias(const char*);
 t_simbolo* buscarSimbolo(const char* nombre);
 int obtenerTipo(int);
 void escribirTS();
 int agregarTipo(const char*, const char*);
 void tsEscribirBinario();
+
+
+
+
 
 #endif
